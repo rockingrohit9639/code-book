@@ -5,6 +5,8 @@ const validationSchema = joi
   .object({
     PORT: joi.number().positive().required(),
     DATABASE_URL: joi.string().required(),
+    JWT_SECRET: joi.string().required(),
+    JWT_EXPIRATION: joi.string().required(),
   })
   .required()
 
