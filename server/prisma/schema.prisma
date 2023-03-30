@@ -19,6 +19,7 @@ model User {
   lastName  String
   role      UserRole @default(USER)
   mobile    Int
+  username  String
   password  String
   salt      String
 }
