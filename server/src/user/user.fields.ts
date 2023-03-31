@@ -6,6 +6,12 @@ export const USER_SELECT_FIELDS = {
   lastName: true,
   mobile: true,
   username: true,
+  bio: true,
+  dob: true,
+  gender: true,
+  github: true,
+  linkedin: true,
+  website: true,
   createdAt: true,
   updatedAt: true,
 }
