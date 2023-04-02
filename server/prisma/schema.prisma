@@ -36,6 +36,7 @@ model User {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   files     File[]
+  posts     Post[]
 }
 
 model File {
@@ -47,4 +48,17 @@ model File {
   mimeType     String
   filename     String
   size         Int
+  post         Post?  @relation(name: "PostImage")
+}
+
+model Post {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  image       File     @relation(fields: [fileId], references: [id], name: "PostImage")
+  fileId      String   @unique @db.ObjectId
+  createdBy   User     @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  createdById String   @db.ObjectId
+  codeSnippet String
+  createdAt   DateTime
+  updatedAt   DateTime
 }
