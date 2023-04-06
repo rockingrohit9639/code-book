@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards } from '@nestjs/common'
+import { Controller, Get, Param, UseGuards } from '@nestjs/common'
 import { UserService } from './user.service'
 import { UserWithoutSensitiveData } from './user.type'
 import { JwtGuard } from '~/auth/jwt/jwt.guard'
@@ -18,5 +18,10 @@ export class UserController {
   @Get()
   findAll(): Promise<UserWithoutSensitiveData[]> {
     return this.userService.findAll()
+  }
+
+  @Get(':id')
+  findOneById(@Param('id') id: string): Promise<UserWithoutSensitiveData> {
+    return this.userService.findOneById(id)
   }
 }
