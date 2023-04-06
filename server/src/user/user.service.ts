@@ -11,8 +11,11 @@ import { USER_SELECT_FIELDS } from './user.fields'
 export class UserService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  findAll(): Promise<User[]> {
-    return this.prismaService.user.findMany()
+  findAll(): Promise<UserWithoutSensitiveData[]> {
+    return this.prismaService.user.findMany({
+      where: { role: { not: 'ADMIN' } },
+      select: USER_SELECT_FIELDS,
+    })
   }
 
   async findOneById(id: string): Promise<User> {
