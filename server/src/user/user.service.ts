@@ -6,6 +6,7 @@ import { PrismaService } from '~/prisma/prisma.service'
 import { UserWithoutSensitiveData } from './user.type'
 import { SignupDto } from '~/auth/auth.dto'
 import { USER_SELECT_FIELDS } from './user.fields'
+import { UpdateUserProfileDto } from './user.dto'
 
 @Injectable()
 export class UserService {
@@ -81,6 +82,16 @@ export class UserService {
 
     return this.prismaService.user.create({
       data,
+      select: USER_SELECT_FIELDS,
+    })
+  }
+
+  async updateUserProfile(id: string, dto: UpdateUserProfileDto): Promise<UserWithoutSensitiveData> {
+    const user = await this.findOneById(id)
+
+    return this.prismaService.user.update({
+      where: { id: user.id },
+      data: dto,
       select: USER_SELECT_FIELDS,
     })
   }
