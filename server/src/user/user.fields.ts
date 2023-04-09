@@ -14,4 +14,8 @@ export const USER_SELECT_FIELDS = {
   website: true,
   createdAt: true,
   updatedAt: true,
+  followers: true,
+  following: true,
+  followerIds: true,
+  followingIds: true,
 }
