@@ -1,4 +1,10 @@
-import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common'
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common'
 import { Prisma, User } from '@prisma/client'
 import * as bcrypt from 'bcrypt'
 import { omit } from 'lodash'
@@ -86,8 +92,15 @@ export class UserService {
     })
   }
 
-  async updateUserProfile(id: string, dto: UpdateUserProfileDto): Promise<UserWithoutSensitiveData> {
-    const user = await this.findOneById(id)
+  async updateUserProfile(
+    id: string,
+    dto: UpdateUserProfileDto,
+    user: UserWithoutSensitiveData,
+  ): Promise<UserWithoutSensitiveData> {
+    const existedUser = await this.findOneById(id)
+    if (existedUser.id !== user.id) {
+      throw new ForbiddenException('You are not allowed to update this profile!')
+    }
 
     return this.prismaService.user.update({
       where: { id: user.id },
@@ -98,5 +111,63 @@ export class UserService {
 
   private sanitizeUser(user: User): UserWithoutSensitiveData {
     return omit(user, 'password', 'salt')
+  }
+
+  /**
+   * Followers and Followings
+   */
+
+  async follow(
+    userId: string,
+    currentUser: UserWithoutSensitiveData,
+  ): Promise<[UserWithoutSensitiveData, UserWithoutSensitiveData]> {
+    const user = await this.findOneById(userId)
+
+    const [updatedUser, updatedCurrentUser] = await Promise.all([
+      this.prismaService.user.update({
+        where: { id: user.id },
+        data: { followers: { connect: { id: currentUser.id } } },
+        select: USER_SELECT_FIELDS,
+      }),
+      this.prismaService.user.update({
+        where: { id: currentUser.id },
+        data: { following: { connect: { id: user.id } } },
+        select: USER_SELECT_FIELDS,
+      }),
+    ])
+
+    return [updatedUser, updatedCurrentUser]
+  }
+
+  async unfollow(
+    userId: string,
+    currentUser: UserWithoutSensitiveData,
+  ): Promise<[UserWithoutSensitiveData, UserWithoutSensitiveData]> {
+    const user = await this.findOneById(userId)
+
+    const [updatedUser, updatedCurrentUser] = await Promise.all([
+      this.prismaService.user.update({
+        where: { id: user.id },
+        data: { followers: { disconnect: { id: currentUser.id } } },
+        select: USER_SELECT_FIELDS,
+      }),
+      this.prismaService.user.update({
+        where: { id: currentUser.id },
+        data: { following: { disconnect: { id: user.id } } },
+        select: USER_SELECT_FIELDS,
+      }),
+    ])
+
+    return [updatedUser, updatedCurrentUser]
+  }
+
+  async removeFollower(userId: string, currentUser: UserWithoutSensitiveData): Promise<UserWithoutSensitiveData> {
+    const user = await this.findOneById(userId)
+
+    return this.prismaService.user.update({
+      where: { id: currentUser.id },
+      data: { followers: { disconnect: { id: user.id } } },
+      select: USER_SELECT_FIELDS,
+    })
   }
 }

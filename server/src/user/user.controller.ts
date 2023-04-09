@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, UseGuards } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common'
 import { UserService } from './user.service'
 import { UserWithoutSensitiveData } from './user.type'
 import { JwtGuard } from '~/auth/jwt/jwt.guard'
@@ -26,8 +26,43 @@ export class UserController {
     return this.userService.findOneById(id)
   }
 
+  @UseGuards(JwtGuard)
   @Patch(':id')
-  updateUserProfile(@Param('id') id: string, @Body() dto: UpdateUserProfileDto): Promise<UserWithoutSensitiveData> {
-    return this.userService.updateUserProfile(id, dto)
+  updateUserProfile(
+    @Param('id') id: string,
+    @Body() dto: UpdateUserProfileDto,
+    @GetUser() user: UserWithoutSensitiveData,
+  ): Promise<UserWithoutSensitiveData> {
+    return this.userService.updateUserProfile(id, dto, user)
+  }
+
+  /**
+   * Followers and Followings
+   */
+  @UseGuards(JwtGuard)
+  @Post('/followers/:userId')
+  follow(
+    @Param('userId') userId: string,
+    @GetUser() currentUser: UserWithoutSensitiveData,
+  ): Promise<[UserWithoutSensitiveData, UserWithoutSensitiveData]> {
+    return this.userService.follow(userId, currentUser)
+  }
+
+  @UseGuards(JwtGuard)
+  @Post('followers/unfollow/:userId')
+  unfollow(
+    @Param('userId') userId: string,
+    @GetUser() currentUser: UserWithoutSensitiveData,
+  ): Promise<[UserWithoutSensitiveData, UserWithoutSensitiveData]> {
+    return this.userService.unfollow(userId, currentUser)
+  }
+
+  @UseGuards(JwtGuard)
+  @Delete('followers/:userId')
+  removeFollower(
+    @Param('userId') userId: string,
+    @GetUser() currentUser: UserWithoutSensitiveData,
+  ): Promise<UserWithoutSensitiveData> {
+    return this.userService.removeFollower(userId, currentUser)
   }
 }
