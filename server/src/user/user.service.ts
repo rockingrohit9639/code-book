@@ -42,8 +42,18 @@ export class UserService {
     return user
   }
 
-  async validateUser(email: string, password: string): Promise<UserWithoutSensitiveData> {
-    const user = await this.findOneByEmail(email)
+  async validateUser(usernameOrEmail: string, password: string): Promise<UserWithoutSensitiveData> {
+    let user: User | null
+
+    user = await this.prismaService.user.findFirst({ where: { email: usernameOrEmail.trim() } })
+    if (!user) {
+      user = await this.prismaService.user.findFirst({ where: { username: usernameOrEmail.trim() } })
+    }
+
+    if (!user) {
+      throw new NotFoundException(`User with email or username ${usernameOrEmail} not found!`)
+    }
+
     const { password: userPassword, salt } = user
     const hashedPassword = await bcrypt.hash(password, salt)
     if (userPassword !== hashedPassword) {

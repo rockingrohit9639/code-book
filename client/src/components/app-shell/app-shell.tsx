@@ -2,6 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { AiOutlineHome, AiOutlineMessage, AiOutlineNotification, AiOutlineLogout } from 'react-icons/ai'
 import { Avatar, Dropdown } from 'antd'
+import { useAuthContext } from '../../hooks/use-auth'
 
 type AppShellProps = {
   children: React.ReactElement
@@ -10,6 +11,8 @@ type AppShellProps = {
 const NAVBAR_HEIGHT = 60
 
 export default function AppShell({ children }: AppShellProps) {
+  const { logout, user } = useAuthContext()
+
   return (
     <div>
       {/* Navigation Bar Start */}
@@ -45,11 +48,14 @@ export default function AppShell({ children }: AppShellProps) {
                     key: 'logout',
                     icon: <AiOutlineLogout />,
                     label: 'Logout',
+                    onClick: logout,
                   },
                 ],
               }}
             >
-              <Avatar className="bg-primary/80 text-background cursor-pointer">U</Avatar>
+              <Avatar className="bg-primary/80 text-background cursor-pointer">
+                {user?.username[0].toUpperCase()}
+              </Avatar>
             </Dropdown>
           </ul>
         </div>

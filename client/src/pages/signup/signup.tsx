@@ -1,14 +1,18 @@
 import { Button, Form, Input, InputNumber } from 'antd'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
 import { PASSWORD_REGEX } from '../../utils/constants'
 import { isEmailExists, isUsernameExists, signUp } from '../../queries/auth'
 import { useDebounce } from '../../hooks/use-debounce'
 import useError from '../../hooks/use-error'
 import { ENV } from '../../utils/env'
+import { SignupDto } from '../../types/auth'
+import { useAuthContext } from '../../hooks/use-auth'
 
 export default function Signup() {
-  const [form] = Form.useForm()
+  const { user } = useAuthContext()
+
+  const [form] = Form.useForm<SignupDto>()
 
   const usernameValue = Form.useWatch('username', form)
   const emailValue = Form.useWatch('email', form)
@@ -49,6 +53,10 @@ export default function Signup() {
       navigate('/', { replace: true })
     },
   })
+
+  if (user) {
+    return <Navigate to="/" />
+  }
 
   return (
     <div

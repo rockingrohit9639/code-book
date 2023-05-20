@@ -1,7 +1,17 @@
 import { Button, Form, Input } from 'antd'
-import { Link } from 'react-router-dom'
+import { Link, Navigate, useSearchParams } from 'react-router-dom'
+import { useAuthContext } from '../../hooks/use-auth'
 
 export default function Login() {
+  const { user, loginMutation } = useAuthContext()
+
+  const [searchParams] = useSearchParams()
+  const redirectTo = searchParams.get('redirectTo') ?? '/'
+
+  if (user) {
+    return <Navigate to={{ pathname: redirectTo }} replace />
+  }
+
   return (
     <div
       className="relative flex h-screen items-center justify-center"
@@ -17,7 +27,13 @@ export default function Login() {
           <div className="text-primary text-xs font-medium">Welcome Back</div>
         </div>
 
-        <Form layout="vertical" className="mb-4">
+        <Form
+          layout="vertical"
+          className="mb-4"
+          onFinish={(values) => {
+            loginMutation.mutate(values)
+          }}
+        >
           <Form.Item
             name="usernameOrEmail"
             label="Username or Email"
@@ -30,7 +46,13 @@ export default function Login() {
             <Input.Password placeholder="Password" />
           </Form.Item>
 
-          <Button htmlType="submit" type="primary" block>
+          <Button
+            htmlType="submit"
+            type="primary"
+            block
+            loading={loginMutation.isLoading}
+            disabled={loginMutation.isLoading}
+          >
             Sign in
           </Button>
         </Form>
