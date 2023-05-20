@@ -37,4 +37,12 @@ export class AuthService {
       token,
     }
   }
+
+  async isUsernameExists(username: string): Promise<boolean> {
+    return this.userService.isUsernameExists(username)
+  }
+
+  async isEmailExists(email: string): Promise<boolean> {
+    return this.userService.isEmailExists(email)
+  }
 }

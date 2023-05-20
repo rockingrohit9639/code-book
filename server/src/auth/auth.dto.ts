@@ -1,12 +1,14 @@
+import { Transform } from 'class-transformer'
 import {
   IsEmail,
-  IsMobilePhone,
   IsNumber,
   IsOptional,
   IsPositive,
   IsString,
   Matches,
+  Max,
   MaxLength,
+  Min,
   MinLength,
 } from 'class-validator'
 import { PASSWORD_REGEX } from '~/constants/constants'
@@ -24,6 +26,7 @@ export class LoginDto {
 
 export class SignupDto {
   @IsEmail()
+  @Transform((obj) => obj.value.toLowerCase())
   email: string
 
   @IsOptional()
@@ -41,12 +44,14 @@ export class SignupDto {
   @IsString()
   @MinLength(4)
   @MaxLength(20)
+  @Transform((obj) => obj.value.toLowerCase())
   username: string
 
   @IsOptional()
   @IsNumber()
   @IsPositive()
-  @IsMobilePhone('en-IN')
+  @Min(10000_00000)
+  @Max(99999_99999)
   mobile?: number
 
   @IsString()

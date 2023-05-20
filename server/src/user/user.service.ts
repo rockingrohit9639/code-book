@@ -113,6 +113,22 @@ export class UserService {
     return omit(user, 'password', 'salt')
   }
 
+  async isUsernameExists(username: string): Promise<boolean> {
+    const user = await this.prismaService.user.findFirst({ where: { username } })
+    if (user) {
+      return true
+    }
+    return false
+  }
+
+  async isEmailExists(email: string): Promise<boolean> {
+    const user = await this.prismaService.user.findFirst({ where: { email } })
+    if (user) {
+      return true
+    }
+    return false
+  }
+
   /**
    * Followers and Followings
    */
