@@ -7,12 +7,17 @@ type AppShellProps = {
   children: React.ReactElement
 }
 
+const NAVBAR_HEIGHT = 60
+
 export default function AppShell({ children }: AppShellProps) {
   return (
     <div>
       {/* Navigation Bar Start */}
-      <div className="mb-2 border-b">
-        <div className="mx-auto flex w-full max-w-screen-xl items-center justify-between py-4">
+      <div className="bg-background fixed left-0 top-0 z-10 w-full border-b">
+        <div
+          className="mx-auto flex w-full max-w-screen-xl items-center justify-between"
+          style={{ height: `${NAVBAR_HEIGHT}px` }}
+        >
           <div className="text-2xl font-bold">
             <span className="text-primary">C</span>odebook
           </div>
@@ -52,11 +57,16 @@ export default function AppShell({ children }: AppShellProps) {
       {/* Navigation Bar End */}
 
       {/* @TODO Add Sidebars */}
-      <div className="grid grid-cols-12">
+      <div
+        className="grid grid-cols-12"
+        style={{ marginTop: `${NAVBAR_HEIGHT}px`, minHeight: `calc(100vh - ${NAVBAR_HEIGHT}px)` }}
+      >
         <div className="col-span-3" />
-        <div className="col-span-6">{children}</div>
+        <div className="col-span-6 border-l border-r p-4">{children}</div>
         <div className="col-span-3" />
       </div>
     </div>
   )
 }
+
+AppShell.NAVBAR_HEIGHT = NAVBAR_HEIGHT
