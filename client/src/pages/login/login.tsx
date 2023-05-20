@@ -6,7 +6,7 @@ export default function Login() {
     <div
       className="relative flex h-screen items-center justify-center"
       style={{
-        background: 'url("/login-bg-image.jpg")',
+        background: 'url("/bg-image.jpg")',
         backgroundSize: 'cover',
       }}
     >
@@ -14,41 +14,29 @@ export default function Login() {
       <div className="relative z-10 w-full max-w-md rounded-md bg-white p-8 shadow">
         <div className="mb-8 text-center">
           <div className="text-lg font-semibold">Login</div>
-          <div className="text-content-secondary text-xs font-medium">Login with email and password</div>
+          <div className="text-primary text-xs font-medium">Welcome Back</div>
         </div>
 
-        <Form layout="vertical" requiredMark={false} className="mb-4">
-          <Form.Item hidden name="csrfToken">
-            <Input />
-          </Form.Item>
+        <Form layout="vertical" className="mb-4">
           <Form.Item
-            name="username"
-            label="Email"
-            rules={[
-              { required: true, message: 'Email is required' },
-              { type: 'email', message: 'Please enter a valid email' },
-            ]}
+            name="usernameOrEmail"
+            label="Username or Email"
+            rules={[{ required: true, message: 'Username or email  is required' }]}
           >
-            <Input placeholder="Email" />
+            <Input placeholder="Username or Email" />
           </Form.Item>
 
           <Form.Item name="password" label="Password" rules={[{ required: true, message: 'Password is required' }]}>
             <Input.Password placeholder="Password" />
           </Form.Item>
 
-          <Button
-            htmlType="submit"
-            type="primary"
-            block
-            // loading={signinMutation.isLoading}
-            // disabled={signinMutation.isLoading}
-          >
+          <Button htmlType="submit" type="primary" block>
             Sign in
           </Button>
         </Form>
 
         <Link to="/signup">
-          <Button block>Sign Up</Button>
+          <Button block>Did not have an account ?</Button>
         </Link>
       </div>
     </div>
