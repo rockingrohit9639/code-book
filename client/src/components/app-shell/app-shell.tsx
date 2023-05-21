@@ -1,6 +1,6 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
-import { AiOutlineHome, AiOutlineMessage, AiOutlineNotification, AiOutlineLogout } from 'react-icons/ai'
+import { Link, useNavigate } from 'react-router-dom'
+import { AiOutlineHome, AiOutlineMessage, AiOutlineNotification, AiOutlineLogout, AiOutlineUser } from 'react-icons/ai'
 import { Avatar, Dropdown } from 'antd'
 import { useAuthContext } from '../../hooks/use-auth'
 
@@ -12,6 +12,7 @@ const NAVBAR_HEIGHT = 60
 
 export default function AppShell({ children }: AppShellProps) {
   const { logout, user } = useAuthContext()
+  const navigate = useNavigate()
 
   return (
     <div>
@@ -44,6 +45,14 @@ export default function AppShell({ children }: AppShellProps) {
               trigger={['click']}
               menu={{
                 items: [
+                  {
+                    key: 'user',
+                    icon: <AiOutlineUser />,
+                    label: `@${user?.username}`,
+                    onClick: () => {
+                      navigate('/profile')
+                    },
+                  },
                   {
                     key: 'logout',
                     icon: <AiOutlineLogout />,
