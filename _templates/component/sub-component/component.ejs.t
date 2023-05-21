@@ -1,7 +1,6 @@
 ---
 to: client/src/components/<%= parent %>/components/<%= name %>.tsx
 ---
-import React from 'react'
 import clsx from 'clsx'
 
 type <%= h.changeCase.pascal(name) %>Props = {
