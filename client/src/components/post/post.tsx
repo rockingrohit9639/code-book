@@ -1,7 +1,9 @@
 import clsx from 'clsx'
 import { Link } from 'react-router-dom'
 import { AiOutlineComment, AiOutlineHeart, AiOutlineShareAlt } from 'react-icons/ai'
+import { useState } from 'react'
 import { useUser } from '~/hooks/use-user'
+import Comments from './components/comments'
 
 type PostProps = {
   className?: string
@@ -9,6 +11,7 @@ type PostProps = {
 }
 
 export default function Post({ className, style }: PostProps) {
+  const [commentVisible, setCommentVisible] = useState(false)
   const { user } = useUser()
 
   return (
@@ -28,7 +31,12 @@ export default function Post({ className, style }: PostProps) {
           <AiOutlineHeart className="h-6 w-6 hover:text-gray-500" />
         </div>
 
-        <div className="cursor-pointer">
+        <div
+          className="cursor-pointer"
+          onClick={() => {
+            setCommentVisible((prev) => !prev)
+          }}
+        >
           <AiOutlineComment className="h-6 w-6 hover:text-gray-500" />
         </div>
 
@@ -36,6 +44,8 @@ export default function Post({ className, style }: PostProps) {
           <AiOutlineShareAlt className="h-6 w-6 hover:text-gray-500" />
         </div>
       </div>
+
+      {commentVisible ? <Comments className="border-t-2" /> : null}
     </div>
   )
 }

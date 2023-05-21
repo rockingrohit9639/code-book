@@ -6,4 +6,8 @@
   body {
     @apply bg-background;
   }
+
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
 }

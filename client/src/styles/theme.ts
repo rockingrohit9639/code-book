@@ -13,6 +13,9 @@ export const ANTD_THEME: ThemeConfig = {
     colorText: colors.gray['700'],
     colorTextTertiary: colors.gray['500'],
 
+    colorBgBase: '#F8F1F1',
+    colorBorder: colors.gray['300'],
+
     colorError: colors.red['500'],
     colorWarning: colors.yellow['600'],
     colorSuccess: colors.green['600'],
