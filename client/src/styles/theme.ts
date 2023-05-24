@@ -7,13 +7,13 @@ type ThemeConfig = React.ComponentProps<typeof ConfigProvider>['theme']
 export const ANTD_THEME: ThemeConfig = {
   token: {
     fontSize: 16,
-    fontFamily: ['Inter', ...defaultTheme.fontFamily.sans].join(', '),
+    fontFamily: ['Fira Code', ...defaultTheme.fontFamily.sans].join(', '),
 
-    colorPrimary: '#E57C23',
+    colorPrimary: '#5701ff',
     colorText: colors.gray['700'],
     colorTextTertiary: colors.gray['500'],
 
-    colorBgBase: '#F8F1F1',
+    colorBgBase: '#f3f5f8',
     colorBorder: colors.gray['300'],
 
     colorError: colors.red['500'],

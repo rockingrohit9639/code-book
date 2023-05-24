@@ -1,11 +1,14 @@
 import { Outlet, Route, Routes } from 'react-router-dom'
 import { Spin } from 'antd'
-import Home from './pages/home'
+import { Suspense, lazy } from 'react'
 import AuthProtection from './components/auth-protection'
 import AppShell from './components/app-shell'
 import Login from './pages/login/'
 import Signup from './pages/signup'
 import { useAuthContext } from './hooks/use-auth'
+import CreateNewPost from './pages/create-new-post'
+
+const Home = lazy(() => import('./pages/home'))
 
 function App() {
   const { authVerificationInProgress } = useAuthContext()
@@ -22,14 +25,23 @@ function App() {
     <Routes>
       <Route
         element={
-          <AuthProtection>
-            <AppShell>
-              <Outlet />
-            </AppShell>
-          </AuthProtection>
+          <Suspense
+            fallback={
+              <div className="flex h-screen w-full items-center justify-center">
+                <Spin tip="Loading please wait..." />
+              </div>
+            }
+          >
+            <AuthProtection>
+              <AppShell>
+                <Outlet />
+              </AppShell>
+            </AuthProtection>
+          </Suspense>
         }
       >
         <Route path="/" element={<Home />} />
+        <Route path="/create-new-post" element={<CreateNewPost />} />
       </Route>
 
       <Route path="/login" element={<Login />} />
