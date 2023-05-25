@@ -22,7 +22,7 @@ export class PostController {
   }
 
   @PostRoute()
-  create(@Body() dto: CreatePostDto, @GetUser() user: UserWithoutSensitiveData): Promise<Post> {
+  create(@Body() dto: CreatePostDto, @GetUser() user: UserWithoutSensitiveData) {
     return this.postService.create(dto, user)
   }
 

@@ -4,10 +4,11 @@ import { PrismaService } from '~/prisma/prisma.service'
 import { CreatePostDto, UpdatePostDto } from './post.dto'
 import { UserWithoutSensitiveData } from '~/user/user.type'
 import { POST_INCLUDE_FIELDS } from './post.fields'
+import { FileService } from '~/file/file.service'
 
 @Injectable()
 export class PostService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(private readonly prismaService: PrismaService, private readonly fileService: FileService) {}
 
   findAll(): Promise<Post[]> {
     return this.prismaService.post.findMany()
@@ -21,12 +22,14 @@ export class PostService {
     return post
   }
 
-  create(dto: CreatePostDto, user: UserWithoutSensitiveData): Promise<Post> {
+  async create(dto: CreatePostDto, user: UserWithoutSensitiveData) {
+    const imageCreated = await this.fileService.createFileByBase64String(dto.imageBase64, user)
+
     return this.prismaService.post.create({
       data: {
         title: dto.title,
         codeSnippet: dto.codeSnippet,
-        image: { connect: { id: dto.image } },
+        image: { connect: { id: imageCreated.id } },
         createdBy: { connect: { id: user.id } },
       },
       include: POST_INCLUDE_FIELDS,

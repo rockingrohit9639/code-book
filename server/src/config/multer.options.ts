@@ -8,7 +8,7 @@ import { MimeType } from '~/file/file.type'
 import { EnvironmentVars } from './config.options'
 import { VALID_IMAGE_TYPES } from '~/constants/multer'
 
-function getFilename() {
+export function getFilename() {
   return crypto.randomBytes(16).toString('hex')
 }
 

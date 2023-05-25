@@ -1,6 +1,6 @@
 import * as path from 'path'
 import * as fs from 'fs'
-import { Injectable, NotFoundException } from '@nestjs/common'
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { File } from '@prisma/client'
 import { Response } from 'express'
@@ -8,6 +8,7 @@ import * as contentDisposition from 'content-disposition'
 import { EnvironmentVars } from '~/config/config.options'
 import { PrismaService } from '~/prisma/prisma.service'
 import { UserWithoutSensitiveData } from '~/user/user.type'
+import { getFilename } from '~/config/multer.options'
 
 @Injectable()
 export class FileService {
@@ -59,5 +60,35 @@ export class FileService {
     response.setHeader('content-type', file.mimeType)
     response.setHeader('Content-Disposition', contentDisposition(file.filename, { type: 'inline' }))
     response.sendFile(path)
+  }
+
+  async createFileByBase64String(base64Image: string, user: UserWithoutSensitiveData): Promise<File> {
+    /** Removing the header from base64 image string */
+    const imageWithoutHeader = base64Image.split(';base64,').pop()
+    if (!imageWithoutHeader) {
+      throw new InternalServerErrorException('Something went wrong!')
+    }
+
+    /** Saving the file to disk */
+    const filename = getFilename()
+    const filePath = path.resolve(this.uploadDirectory, filename)
+    fs.writeFile(filePath, imageWithoutHeader, 'base64', (error) => {
+      if (error) {
+        throw new InternalServerErrorException('Something went wrong!')
+      }
+    })
+
+    return this.prismaService.file.create({
+      data: {
+        originalName: filename,
+        encoding: '7bit',
+        mimeType: 'image/png',
+        filename,
+        size: 1044659,
+        createdBy: {
+          connect: { id: user.id },
+        },
+      },
+    })
   }
 }

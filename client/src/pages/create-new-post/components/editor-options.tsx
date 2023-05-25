@@ -35,7 +35,7 @@ export default function EditorOptions({ className, style, form }: EditorOptionsP
       form.setFieldValue('language', language)
 
       const defaultCode = EDITOR_DEFAULT_CODES[language]
-      form.setFieldValue('code', defaultCode)
+      form.setFieldValue('codeSnippet', defaultCode)
     },
     [form],
   )
@@ -43,7 +43,7 @@ export default function EditorOptions({ className, style, form }: EditorOptionsP
   useEffect(() => {
     const language = form.getFieldValue('language')
     const defaultCode = EDITOR_DEFAULT_CODES[language]
-    form.setFieldValue('code', defaultCode)
+    form.setFieldValue('codeSnippet', defaultCode)
   }, [form])
 
   return (
