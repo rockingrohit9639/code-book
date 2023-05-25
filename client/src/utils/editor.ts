@@ -159,3 +159,106 @@ export const EDITOR_SETTINGS: Record<string, boolean> = {
   completionKeymap: false,
   lintKeymap: false,
 }
+
+export const EDITOR_DEFAULT_CODES: Record<string, string> = {
+  HTML: `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Form in HTML</title>
+</head>
+<body>
+<form>
+  <label for="fname">First name:</label><br>
+  <input type="text" id="fname" name="fname"><br>
+  <label for="lname">Last name:</label><br>
+  <input type="text" id="lname" name="lname">
+</form>
+</body>
+</html>`,
+  CSS: `/* Changing background color  */
+body {
+  background-color: #f0f0f0;
+}
+`,
+  JavaScript: `// generating  a random number
+const a = Math.random();
+console.log(a);
+`,
+  Java: `class Simple{  
+  public static void main(String args[]){  
+   System.out.println("Hello Java");  
+  }  
+}
+`,
+  'C/C++': `
+// Your First C++ Program
+#include <iostream>
+
+int main() {
+    std::cout << "Hello World!";
+    return 0;
+}`,
+  JSON: `
+{
+    "employees":[
+      { "firstName":"John", "lastName":"Doe" },
+      {"firstName":"Anna", "lastName":"Smith" },
+      {"firstName":"Peter", "lastName":"Jones" }
+    ]
+}
+`,
+  Lezer: `
+// generating  a random number
+const a = Math.random();
+console.log(a);
+`,
+  Markdown: `
+# This is an H1 #
+
+## This is an H2 ##
+  
+### This is an H3 ###
+`,
+  PHP: `
+<?php
+  $name = "Codebook";
+  echo "Hey! This is " . $name . "<br>";
+?>
+`,
+  Python: `
+print("Hello World!")
+`,
+  Rust: `
+fn main() {
+  println!("Hello World!");
+}
+`,
+  SQL: `-- creating a table
+CREATE TABLE STATION
+(ID INTEGER PRIMARY KEY,
+CITY CHAR(20),
+STATE CHAR(2),
+LAT_N REAL,
+LONG_W REAL);
+`,
+  XML: `<?xml version="1.0" encoding="UTF-8"?>
+- <note>
+  <to>Tove</to>
+  <from>Jani</from>
+  <heading>Reminder</heading>
+  <body>Don't forget me this weekend!</body>
+</note>
+`,
+  WAST: `[package]
+name = "hello-world"
+version = "0.1.0"
+authors = ["Your Name <your@name.com>"]
+edition = "2018"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+wasm-bindgen = "0.2"
+`,
+}
