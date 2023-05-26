@@ -11,7 +11,7 @@ export class PostService {
   constructor(private readonly prismaService: PrismaService, private readonly fileService: FileService) {}
 
   findAll(): Promise<Post[]> {
-    return this.prismaService.post.findMany()
+    return this.prismaService.post.findMany({ include: POST_INCLUDE_FIELDS })
   }
 
   async findOneById(id: string): Promise<Post> {

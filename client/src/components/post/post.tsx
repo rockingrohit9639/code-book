@@ -2,28 +2,35 @@ import clsx from 'clsx'
 import { Link } from 'react-router-dom'
 import { AiOutlineComment, AiOutlineHeart, AiOutlineShareAlt } from 'react-icons/ai'
 import { useState } from 'react'
-import { useUser } from '~/hooks/use-user'
+import { useQuery } from 'react-query'
 import Comments from './components/comments'
+import { Post as PostType } from '~/types/post'
+import { fetchFileById } from '~/queries/file'
 
 type PostProps = {
   className?: string
   style?: React.CSSProperties
+  post: PostType
 }
 
-export default function Post({ className, style }: PostProps) {
+export default function Post({ className, style, post }: PostProps) {
   const [commentVisible, setCommentVisible] = useState(false)
-  const { user } = useUser()
+  const postImage = useQuery(['post-image', post.id], () => fetchFileById(post.imageId))
 
   return (
-    <div className={clsx('overflow-hidden rounded-2xl border-2', className)} style={style}>
-      <div className="space-y-2 border-b p-4">
+    <div className={clsx('overflow-hidden rounded-2xl border-2', className)} id={post.id} style={style}>
+      <div className="space-y-2 p-4">
         <Link to={'/profile/userId'} className="text-gray-500">
-          @{user.username}
+          @{post.createdBy.username}
         </Link>
-        <div>This is testing post</div>
+        <div>{post.title}</div>
       </div>
-      <div className="h-[30rem] w-full">
-        <img src="/code.png" alt="code" className="h-full w-full object-cover" />
+      <div className="w-full">
+        {postImage.isLoading ? (
+          <div className="h-full w-full animate-pulse bg-gray-200" />
+        ) : (
+          <img src={URL.createObjectURL(postImage.data)} alt="code" className="h-full w-full object-contain" />
+        )}
       </div>
 
       <div className="flex items-center space-x-4 p-4">
