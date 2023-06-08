@@ -3,12 +3,14 @@ import { useQuery } from 'react-query'
 import { Link, useParams } from 'react-router-dom'
 import { AiOutlineGlobal, AiOutlineGithub, AiOutlineLinkedin } from 'react-icons/ai'
 import { EditOutlined } from '@ant-design/icons'
+import { BiBookmark, BiGridAlt } from 'react-icons/bi'
 import Loading from '~/components/loading'
 import Page from '~/components/page'
 import { fetchProfile } from '~/queries/user'
 import { getErrorMessage } from '~/utils/error'
 import UpdateProfileModal from '~/components/update-profile-modal'
 import { useUser } from '~/hooks/use-user'
+import Post from '~/components/post'
 
 export default function Profile() {
   const { id } = useParams() as { id: string }
@@ -86,7 +88,30 @@ export default function Profile() {
         </div>
       </div>
       <Tabs>
-        <Tabs.TabPane tab="Posts" key="posts" />
+        <Tabs.TabPane
+          tab={
+            <div className="flex items-center space-x-2">
+              <BiGridAlt />
+              <div>Posts</div>
+            </div>
+          }
+          key="posts"
+        >
+          <div className="space-y-4">
+            {profile.data?.posts && profile.data.posts.length > 0
+              ? profile.data.posts.map((post) => <Post key={post.id} post={post} />)
+              : null}
+          </div>
+        </Tabs.TabPane>
+        <Tabs.TabPane
+          tab={
+            <div className="flex items-center space-x-2">
+              <BiBookmark />
+              <div>Saved</div>
+            </div>
+          }
+          key="saved"
+        />
       </Tabs>
     </Page>
   )

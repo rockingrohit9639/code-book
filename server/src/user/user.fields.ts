@@ -20,5 +20,5 @@ export const USER_SELECT_FIELDS = {
   following: true,
   followerIds: true,
   followingIds: true,
-  posts: true,
+  posts: { include: { createdBy: true, image: true } },
 } satisfies Prisma.UserSelect
