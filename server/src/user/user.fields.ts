@@ -1,3 +1,5 @@
+import { Prisma } from '@prisma/client'
+
 export const USER_SELECT_FIELDS = {
   id: true,
   email: true,
@@ -18,4 +20,5 @@ export const USER_SELECT_FIELDS = {
   following: true,
   followerIds: true,
   followingIds: true,
-}
+  posts: true,
+} satisfies Prisma.UserSelect

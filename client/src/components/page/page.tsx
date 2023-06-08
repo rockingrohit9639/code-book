@@ -9,7 +9,7 @@ type PageProps = {
   children: React.ReactNode
 }
 
-export default function Page({ className, style, isFullScreen = false, isHeroSection = false, children }: PageProps) {
+export default function Page({ className, style, isFullScreen = false, isHeroSection = true, children }: PageProps) {
   return (
     <div
       className={clsx(!isFullScreen ? 'mx-auto max-w-screen-xl px-8 lg:px-0' : undefined, className)}

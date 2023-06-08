@@ -23,7 +23,9 @@ export default function AppShell({ children }: AppShellProps) {
           style={{ height: `${NAVBAR_HEIGHT}px` }}
         >
           <div className="text-2xl font-bold">
-            <span className="text-primary">C</span>odebook
+            <Link to="/">
+              <span className="text-primary">C</span>odebook
+            </Link>
           </div>
           <ul className="flex items-center gap-4">
             <li className="hover:text-primary transition-all delay-75 ease-in-out">
@@ -50,7 +52,7 @@ export default function AppShell({ children }: AppShellProps) {
                     icon: <AiOutlineUser />,
                     label: `@${user?.username}`,
                     onClick: () => {
-                      navigate('/profile')
+                      navigate(`/profile/${user?.id}`)
                     },
                   },
                   {

@@ -6,9 +6,10 @@ import AppShell from './components/app-shell'
 import Login from './pages/login/'
 import Signup from './pages/signup'
 import { useAuthContext } from './hooks/use-auth'
-import CreateNewPost from './pages/create-new-post'
 
+const CreateNewPost = lazy(() => import('./pages/create-new-post'))
 const Home = lazy(() => import('./pages/home'))
+const Profile = lazy(() => import('./pages/profile'))
 
 function App() {
   const { authVerificationInProgress } = useAuthContext()
@@ -42,6 +43,7 @@ function App() {
       >
         <Route path="/" element={<Home />} />
         <Route path="/create-new-post" element={<CreateNewPost />} />
+        <Route path="/profile/:id" element={<Profile />} />
       </Route>
 
       <Route path="/login" element={<Login />} />

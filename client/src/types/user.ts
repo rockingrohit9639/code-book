@@ -1,3 +1,5 @@
+import { Post } from './post'
+
 export type UserWithoutSensitiveData = Omit<User, 'password' | 'salt'>
 
 export type User = {
@@ -22,4 +24,6 @@ export type User = {
   followerIds: string[]
   following: User[]
   followingIds: string[]
+  posts: Post[]
+  postIds: string[]
 }
