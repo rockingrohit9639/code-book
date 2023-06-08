@@ -3,11 +3,15 @@ import {
   IsDateString,
   IsEmail,
   IsEnum,
-  IsMobilePhone,
+  IsInt,
+  IsNumber,
   IsOptional,
+  IsPositive,
   IsString,
   IsUrl,
+  Max,
   MaxLength,
+  Min,
   MinLength,
 } from 'class-validator'
 
@@ -29,7 +33,11 @@ export class UpdateUserProfileDto {
   lastName?: string
 
   @IsOptional()
-  @IsMobilePhone('en-IN')
+  @IsNumber()
+  @IsPositive()
+  @IsInt()
+  @Min(10000_00000)
+  @Max(99999_99999)
   mobile?: number
 
   @IsOptional()

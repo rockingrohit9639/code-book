@@ -18,29 +18,32 @@ enum Gender {
 }
 
 model User {
-  id           String    @id @default(auto()) @map("_id") @db.ObjectId
-  email        String    @unique
-  firstName    String?
-  lastName     String?
-  role         UserRole  @default(USER)
-  mobile       Int?
-  username     String    @unique
-  gender       Gender?
-  bio          String?
-  dob          DateTime?
-  website      String?
-  github       String?
-  linkedin     String?
-  password     String
-  salt         String
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  email     String    @unique
+  firstName String?
+  lastName  String?
+  role      UserRole  @default(USER)
+  mobile    Int?
+  username  String    @unique
+  bio       String?
+  dob       DateTime?
+
+  website  String?
+  github   String?
+  linkedin String?
+
+  password String
+  salt     String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   files        File[]
   posts        Post[]
-  followers    User[]    @relation("UserFollows", fields: [followerIds], references: [id])
-  followerIds  String[]  @db.ObjectId
-  following    User[]    @relation("UserFollows", fields: [followingIds], references: [id])
-  followingIds String[]  @db.ObjectId
+  followers    User[]   @relation("UserFollows", fields: [followerIds], references: [id])
+  followerIds  String[] @db.ObjectId
+  following    User[]   @relation("UserFollows", fields: [followingIds], references: [id])
+  followingIds String[] @db.ObjectId
 }
 
 model File {

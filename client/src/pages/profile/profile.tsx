@@ -1,15 +1,18 @@
-import { Result } from 'antd'
+import { Button, Result, Tabs } from 'antd'
 import { useQuery } from 'react-query'
 import { Link, useParams } from 'react-router-dom'
-import { BiGlobe } from 'react-icons/bi'
-import { AiOutlineGithub, AiOutlineLinkedin } from 'react-icons/ai'
+import { AiOutlineGlobal, AiOutlineGithub, AiOutlineLinkedin } from 'react-icons/ai'
+import { EditOutlined } from '@ant-design/icons'
 import Loading from '~/components/loading'
 import Page from '~/components/page'
 import { fetchProfile } from '~/queries/user'
 import { getErrorMessage } from '~/utils/error'
+import UpdateProfileModal from '~/components/update-profile-modal'
+import { useUser } from '~/hooks/use-user'
 
 export default function Profile() {
   const { id } = useParams() as { id: string }
+  const { user } = useUser()
 
   const profile = useQuery(['profile', id], () => fetchProfile(id))
 
@@ -22,16 +25,17 @@ export default function Profile() {
   }
 
   return (
-    <Page className="py-4">
-      <div className="flex items-center gap-8">
-        <img src="/code.png" className="h-60 w-60 rounded-full object-cover" />
-        <div className="space-y-4">
-          <div className="">
+    <Page className="space-y-4 py-4">
+      <div className="grid grid-cols-6 items-center gap-8">
+        <img src="/code.png" className="col-span-2 h-60 w-60 rounded-full object-cover" />
+
+        <div className="col-span-3 space-y-4">
+          <div>
             <div className="font-bold">@{profile.data?.username}</div>
             <div>
               {profile.data?.firstName} {profile.data?.lastName}
             </div>
-            <div>{profile.data?.bio}</div>
+            <div className="text-sm text-gray-500">{profile.data?.bio}</div>
           </div>
 
           <div className="flex items-center space-x-4">
@@ -52,7 +56,7 @@ export default function Profile() {
           <div className="flex items-center space-x-4">
             {profile.data?.website ? (
               <Link to={profile.data.website} target="_black" rel="noreferrer">
-                <BiGlobe className="text-primary h-6 w-6" />
+                <AiOutlineGlobal className="h-6 w-6" />
               </Link>
             ) : null}
             {profile.data?.github ? (
@@ -62,12 +66,28 @@ export default function Profile() {
             ) : null}
             {profile.data?.linkedin ? (
               <Link to={profile.data.linkedin} target="_black" rel="noreferrer">
-                <AiOutlineLinkedin className="h-6 w-6 text-blue-600" />
+                <AiOutlineLinkedin className="h-6 w-6" />
               </Link>
             ) : null}
           </div>
         </div>
+
+        <div className="col-span-1 self-start">
+          {profile.data?.id === user.id ? (
+            <UpdateProfileModal
+              profileId={profile.data?.id!}
+              trigger={
+                <Button type="primary" ghost icon={<EditOutlined />}>
+                  Update Profile
+                </Button>
+              }
+            />
+          ) : null}
+        </div>
       </div>
+      <Tabs>
+        <Tabs.TabPane tab="Posts" key="posts" />
+      </Tabs>
     </Page>
   )
 }

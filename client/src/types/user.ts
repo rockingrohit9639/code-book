@@ -10,7 +10,6 @@ export type User = {
   role: string
   mobile?: number
   username: string
-  gender?: string
   bio?: string
   dob?: string
   website?: string
@@ -27,3 +26,7 @@ export type User = {
   posts: Post[]
   postIds: string[]
 }
+
+export type UpdateProfileDto = Partial<
+  Pick<User, 'firstName' | 'lastName' | 'bio' | 'dob' | 'website' | 'github' | 'linkedin' | 'email'>
+>

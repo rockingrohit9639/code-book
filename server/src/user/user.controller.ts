@@ -5,17 +5,16 @@ import { JwtGuard } from '~/auth/jwt/jwt.guard'
 import { GetUser } from '~/auth/user.decorator'
 import { UpdateUserProfileDto } from './user.dto'
 
+@UseGuards(JwtGuard)
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @UseGuards(JwtGuard)
   @Get('me')
   findMe(@GetUser() user: UserWithoutSensitiveData): UserWithoutSensitiveData {
     return user
   }
 
-  @UseGuards(JwtGuard)
   @Get()
   findAll(): Promise<UserWithoutSensitiveData[]> {
     return this.userService.findAll()
@@ -26,7 +25,6 @@ export class UserController {
     return this.userService.findOneById(id)
   }
 
-  @UseGuards(JwtGuard)
   @Patch(':id')
   updateUserProfile(
     @Param('id') id: string,
@@ -36,10 +34,7 @@ export class UserController {
     return this.userService.updateUserProfile(id, dto, user)
   }
 
-  /**
-   * Followers and Followings
-   */
-  @UseGuards(JwtGuard)
+  /** Followers and Followings */
   @Post('/followers/:userId')
   follow(
     @Param('userId') userId: string,
@@ -48,7 +43,6 @@ export class UserController {
     return this.userService.follow(userId, currentUser)
   }
 
-  @UseGuards(JwtGuard)
   @Post('followers/unfollow/:userId')
   unfollow(
     @Param('userId') userId: string,
@@ -57,7 +51,6 @@ export class UserController {
     return this.userService.unfollow(userId, currentUser)
   }
 
-  @UseGuards(JwtGuard)
   @Delete('followers/:userId')
   removeFollower(
     @Param('userId') userId: string,
