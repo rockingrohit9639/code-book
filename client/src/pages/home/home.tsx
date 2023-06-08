@@ -34,7 +34,7 @@ export default function Home() {
     <Page isFullScreen isHeroSection className="grid grid-cols-12">
       <div className="col-span-3 hidden lg:block" />
       <div className="col-span-full space-y-4 border-l-2 border-r-2 p-4 lg:col-span-6">
-        <div className="mb-4 flex items-center justify-center rounded-2xl border-2 p-4">
+        <div className="mb-4 flex items-center justify-center rounded-2xl border-2 bg-white p-4">
           <Link to="/create-new-post" className="bg-primary text-background rounded-full px-4 py-2 shadow">
             Create New Post
           </Link>

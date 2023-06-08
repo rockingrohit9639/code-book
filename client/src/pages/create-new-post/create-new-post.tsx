@@ -4,6 +4,7 @@ import { PlusOutlined } from '@ant-design/icons'
 import { useCallback, useRef } from 'react'
 import { useMutation } from 'react-query'
 import invariant from 'tiny-invariant'
+import { useNavigate } from 'react-router-dom'
 import Page from '~/components/page/page'
 import EditorOptions from './components/editor-options'
 import { CODEMIRROR_LANGUAGES, CODEMIRROR_THEMES, EDITOR_SETTINGS } from '~/utils/editor'
@@ -14,9 +15,11 @@ import { createPost } from '~/queries/post'
 export default function CreateNewPost() {
   const editorRef = useRef<HTMLDivElement>(null)
   const [form] = Form.useForm()
+  const navigate = useNavigate()
 
   const createPostMutation = useMutation(createPost, {
     onSuccess: () => {
+      navigate('/')
       message.success('Post created successfully!')
     },
   })

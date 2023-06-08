@@ -18,9 +18,9 @@ export default function Post({ className, style, post }: PostProps) {
   const postImage = useQuery(['post-image', post.id], () => fetchFileById(post.imageId))
 
   return (
-    <div className={clsx('overflow-hidden rounded-2xl border-2', className)} id={post.id} style={style}>
+    <div className={clsx('overflow-hidden rounded-2xl border-2 bg-white', className)} id={post.id} style={style}>
       <div className="space-y-2 p-4">
-        <Link to={'/profile/userId'} className="text-gray-500">
+        <Link to={`/profile/${post.createdBy.id}`} className="text-gray-500">
           @{post.createdBy.username}
         </Link>
         <div>{post.title}</div>
