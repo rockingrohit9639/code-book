@@ -13,10 +13,10 @@ import { useUser } from '~/hooks/use-user'
 import Post from '~/components/post'
 
 export default function Profile() {
-  const { id } = useParams() as { id: string }
+  const { username } = useParams() as { username: string }
   const { user } = useUser()
 
-  const profile = useQuery(['profile', id], () => fetchProfile(id))
+  const profile = useQuery(['profile', username], () => fetchProfile(username))
 
   if (profile.isLoading) {
     return <Loading title="Loading user profile...." />

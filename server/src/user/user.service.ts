@@ -34,6 +34,14 @@ export class UserService {
     return user
   }
 
+  async findOneByUsername(username: string): Promise<UserWithoutSensitiveData> {
+    const user = await this.prismaService.user.findFirst({ where: { username }, select: USER_SELECT_FIELDS })
+    if (!user) {
+      throw new NotFoundException('User not found')
+    }
+    return user
+  }
+
   async findOneByEmail(email: string): Promise<User> {
     const user = await this.prismaService.user.findFirst({ where: { email } })
     if (!user) {

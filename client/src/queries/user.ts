@@ -6,8 +6,8 @@ export async function fetchLoggedInUser() {
   return data
 }
 
-export async function fetchProfile(id: string) {
-  const { data } = await apiClient.get<UserWithoutSensitiveData>(`/user/${id}`)
+export async function fetchProfile(username: string) {
+  const { data } = await apiClient.get<UserWithoutSensitiveData>(`/user/${username}`)
   return data
 }
 

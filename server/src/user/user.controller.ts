@@ -20,9 +20,9 @@ export class UserController {
     return this.userService.findAll()
   }
 
-  @Get(':id')
-  findOneById(@Param('id') id: string): Promise<UserWithoutSensitiveData> {
-    return this.userService.findOneById(id)
+  @Get(':username')
+  findOneById(@Param('username') username: string): Promise<UserWithoutSensitiveData> {
+    return this.userService.findOneByUsername(username)
   }
 
   @Patch(':id')
