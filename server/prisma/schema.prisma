@@ -44,6 +44,7 @@ model User {
   followerIds  String[] @db.ObjectId
   following    User[]   @relation("UserFollows", fields: [followingIds], references: [id])
   followingIds String[] @db.ObjectId
+  likedPosts   Like[]
 }
 
 model File {
@@ -68,4 +69,17 @@ model Post {
   codeSnippet String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  likes Like[]
+}
+
+model Like {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  post      Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    String @db.ObjectId
+  likedBy   User   @relation(fields: [likedById], references: [id], onDelete: Cascade)
+  likedById String @db.ObjectId
 }

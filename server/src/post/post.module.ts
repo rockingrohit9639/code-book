@@ -8,6 +8,6 @@ import { FileModule } from '~/file/file.module'
   imports: [FileModule],
   controllers: [PostController],
   providers: [PostService, PrismaService],
-  exports: [],
+  exports: [PostService],
 })
 export class PostModule {}

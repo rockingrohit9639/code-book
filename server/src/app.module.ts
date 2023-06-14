@@ -6,9 +6,10 @@ import { UserModule } from './user/user.module'
 import { AuthModule } from './auth/auth.module'
 import { FileModule } from './file/file.module'
 import { PostModule } from './post/post.module'
+import { LikeModule } from './like/like.module'
 
 @Module({
-  imports: [ConfigModule.forRoot(configOptions), UserModule, AuthModule, FileModule, PostModule],
+  imports: [ConfigModule.forRoot(configOptions), UserModule, AuthModule, FileModule, PostModule, LikeModule],
   controllers: [],
   providers: [PrismaService],
 })

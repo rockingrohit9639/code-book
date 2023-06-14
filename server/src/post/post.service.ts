@@ -20,7 +20,7 @@ export class PostService {
   }
 
   async findOneById(id: string): Promise<Post> {
-    const post = await this.prismaService.post.findFirst({ where: { id } })
+    const post = await this.prismaService.post.findFirst({ where: { id }, include: POST_INCLUDE_FIELDS })
     if (!post) {
       throw new NotFoundException('Post not found')
     }

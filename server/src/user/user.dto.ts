@@ -1,8 +1,6 @@
-import { Gender } from '@prisma/client'
 import {
   IsDateString,
   IsEmail,
-  IsEnum,
   IsInt,
   IsNumber,
   IsOptional,
@@ -39,10 +37,6 @@ export class UpdateUserProfileDto {
   @Min(10000_00000)
   @Max(99999_99999)
   mobile?: number
-
-  @IsOptional()
-  @IsEnum(Gender)
-  gender?: Gender
 
   @IsOptional()
   @IsString()

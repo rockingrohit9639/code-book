@@ -1,11 +1,14 @@
 import clsx from 'clsx'
 import { Link } from 'react-router-dom'
-import { AiOutlineComment, AiOutlineHeart, AiOutlineShareAlt } from 'react-icons/ai'
-import { useState } from 'react'
-import { useQuery } from 'react-query'
+import { AiFillHeart, AiOutlineComment, AiOutlineHeart, AiOutlineShareAlt } from 'react-icons/ai'
+import { useCallback, useEffect, useState } from 'react'
+import { useMutation, useQuery, useQueryClient } from 'react-query'
 import Comments from './components/comments'
 import { Post as PostType } from '~/types/post'
 import { fetchFileById } from '~/queries/file'
+import { likePost, unlikePost } from '~/queries/post'
+import useError from '~/hooks/use-error'
+import { useUser } from '~/hooks/use-user'
 
 type PostProps = {
   className?: string
@@ -15,7 +18,67 @@ type PostProps = {
 
 export default function Post({ className, style, post }: PostProps) {
   const [commentVisible, setCommentVisible] = useState(false)
+  const { handleError } = useError()
+  const queryClient = useQueryClient()
+  const { user } = useUser()
+  const [isPostLiked, setIsPostLiked] = useState<boolean | undefined>()
+
   const postImage = useQuery(['post-image', post.id], () => fetchFileById(post.imageId))
+
+  const likePostMutation = useMutation(likePost, {
+    onError: handleError,
+    onSuccess: (like) => {
+      queryClient.setQueryData<PostType[]>(['posts'], (prev) => {
+        if (!prev) return []
+
+        return prev.map((p) => {
+          if (p.id === post.id) {
+            return {
+              ...p,
+              likes: [...p.likes, like],
+            }
+          }
+          return p
+        })
+      })
+      setIsPostLiked(true)
+    },
+  })
+
+  const unLikePostMutation = useMutation(unlikePost, {
+    onError: handleError,
+    onSuccess: (like) => {
+      queryClient.setQueryData<PostType[]>(['posts'], (prev) => {
+        if (!prev) return []
+
+        return prev.map((p) => {
+          if (p.id === post.id) {
+            return {
+              ...p,
+              likes: p.likes.filter((l) => l.id !== like.id),
+            }
+          }
+          return p
+        })
+      })
+      setIsPostLiked(false)
+    },
+  })
+
+  useEffect(
+    function checkIsPostLiked() {
+      setIsPostLiked(post?.likes?.some((like) => like.likedById === user.id))
+    },
+    [post, user],
+  )
+
+  const handleLikeOrUnlike = useCallback(() => {
+    if (isPostLiked) {
+      unLikePostMutation.mutate(post.id)
+    } else {
+      likePostMutation.mutate(post.id)
+    }
+  }, [isPostLiked, post, likePostMutation, unLikePostMutation])
 
   return (
     <div className={clsx('overflow-hidden rounded-2xl border-2 bg-white', className)} id={post.id} style={style}>
@@ -29,13 +92,17 @@ export default function Post({ className, style, post }: PostProps) {
         {postImage.isLoading ? (
           <div className="h-full w-full animate-pulse bg-gray-200" />
         ) : (
-          <img src={URL.createObjectURL(postImage.data)} alt="code" className="h-full w-full object-contain" />
+          <img src={URL.createObjectURL(postImage.data!)} alt="code" className="h-full w-full object-contain" />
         )}
       </div>
 
       <div className="flex items-center space-x-4 p-4">
-        <div className="cursor-pointer">
-          <AiOutlineHeart className="h-6 w-6 hover:text-gray-500" />
+        <div className="cursor-pointer" onClick={handleLikeOrUnlike}>
+          {isPostLiked ? (
+            <AiFillHeart className="h-6 w-6 text-red-500 hover:text-red-300" />
+          ) : (
+            <AiOutlineHeart className="h-6 w-6 hover:text-gray-500" />
+          )}
         </div>
 
         <div
@@ -51,6 +118,8 @@ export default function Post({ className, style, post }: PostProps) {
           <AiOutlineShareAlt className="h-6 w-6 hover:text-gray-500" />
         </div>
       </div>
+
+      <div className="px-4 pb-4">{post.likes?.length ?? 0} likes</div>
 
       {commentVisible ? <Comments className="border-t-2" /> : null}
     </div>

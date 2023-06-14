@@ -1,6 +1,16 @@
 import { FileType } from './file'
 import { User } from './user'
 
+export type Like = {
+  id: string
+  likedBy: User
+  likedById: string
+  post: Post
+  postId: string
+  createdAt: string
+  updatedAt: string
+}
+
 export type Post = {
   id: string
   title: string
@@ -11,6 +21,7 @@ export type Post = {
   createdById: string
   createdAt: string
   updatedAt: string
+  likes: Like[]
 }
 
 export type CreatePostDto = Pick<Post, 'title' | 'codeSnippet'> & {
