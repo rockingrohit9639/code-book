@@ -11,6 +11,17 @@ export type Like = {
   updatedAt: string
 }
 
+export type Comment = {
+  id: string
+  comment: string
+  commentBy: User
+  commentById: string
+  post: Post
+  postId: string
+  createdAt: string
+  updatedAt: string
+}
+
 export type Post = {
   id: string
   title: string
@@ -22,6 +33,7 @@ export type Post = {
   createdAt: string
   updatedAt: string
   likes: Like[]
+  comments: Comment[]
 }
 
 export type CreatePostDto = Pick<Post, 'title' | 'codeSnippet'> & {

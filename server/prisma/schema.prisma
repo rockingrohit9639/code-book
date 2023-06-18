@@ -71,8 +71,8 @@ model Post {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  likes   Like[]
-  comment Comment[]
+  likes    Like[]
+  comments Comment[]
 }
 
 model Like {

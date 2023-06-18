@@ -1,10 +1,12 @@
-import { Body, Controller, Delete, Param, Post } from '@nestjs/common'
+import { Body, Controller, Delete, Param, Post, UseGuards } from '@nestjs/common'
 import { Comment } from '@prisma/client'
 import { CommentService } from './comment.service'
 import { CreateCommentDto } from './comment.dto'
 import { GetUser } from '~/auth/user.decorator'
 import { UserWithoutSensitiveData } from '~/user/user.type'
+import { JwtGuard } from '~/auth/jwt/jwt.guard'
 
+@UseGuards(JwtGuard)
 @Controller('comment')
 export class CommentController {
   constructor(private readonly commentService: CommentService) {}

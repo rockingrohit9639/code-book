@@ -8,4 +8,5 @@ export const POST_INCLUDE_FIELDS: Prisma.PostInclude = {
   },
   image: { include: { createdBy: { select: omit(USER_SELECT_FIELDS, 'posts') } } },
   likes: { include: { likedBy: { select: omit(USER_SELECT_FIELDS, 'posts') } } },
+  comments: { include: { commentBy: { select: omit(USER_SELECT_FIELDS, 'posts') } } },
 }

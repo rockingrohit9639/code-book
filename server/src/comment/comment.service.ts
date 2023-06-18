@@ -3,6 +3,7 @@ import { Comment } from '@prisma/client'
 import { PrismaService } from '~/prisma/prisma.service'
 import { CreateCommentDto } from './comment.dto'
 import { UserWithoutSensitiveData } from '~/user/user.type'
+import { COMMENT_INCLUDE_FIELDS } from './comment.fields'
 
 @Injectable()
 export class CommentService {
@@ -15,6 +16,7 @@ export class CommentService {
         postId,
         comment: dto.comment,
       },
+      include: COMMENT_INCLUDE_FIELDS,
     })
   }
 

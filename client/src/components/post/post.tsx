@@ -121,7 +121,7 @@ export default function Post({ className, style, post }: PostProps) {
 
       <div className="px-4 pb-4">{post.likes?.length ?? 0} likes</div>
 
-      {commentVisible ? <Comments className="border-t-2" /> : null}
+      {commentVisible ? <Comments className="border-t-2" postId={post.id} comments={post.comments} /> : null}
     </div>
   )
 }
