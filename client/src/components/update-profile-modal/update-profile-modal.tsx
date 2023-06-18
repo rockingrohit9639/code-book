@@ -11,21 +11,21 @@ type UpdateProfileModalProps = {
   className?: string
   style?: React.CSSProperties
   trigger: React.ReactElement<{ onClick: () => void }>
-  profileId: string
+  profileUsername: string
 }
 
-export default function UpdateProfileModal({ className, style, trigger, profileId }: UpdateProfileModalProps) {
+export default function UpdateProfileModal({ className, style, trigger, profileUsername }: UpdateProfileModalProps) {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [form] = Form.useForm()
   const { handleError } = useError()
   const queryClient = useQueryClient()
 
-  const profile = useQuery(['profile', profileId], () => fetchProfile(profileId))
+  const profile = useQuery(['profile', profileUsername], () => fetchProfile(profileUsername))
 
-  const updateProfileMutation = useMutation((dto: UpdateProfileDto) => updateProfile(profileId, dto), {
+  const updateProfileMutation = useMutation((dto: UpdateProfileDto) => updateProfile(profileUsername, dto), {
     onError: handleError,
     onSuccess: (updatedProfile) => {
-      queryClient.setQueryData(['profile', profileId], updatedProfile)
+      queryClient.setQueryData(['profile', profileUsername], updatedProfile)
       setIsModalOpen(false)
     },
   })

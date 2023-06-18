@@ -52,7 +52,7 @@ export default function AppShell({ children }: AppShellProps) {
                     icon: <AiOutlineUser />,
                     label: `@${user?.username}`,
                     onClick: () => {
-                      navigate(`/profile/${user?.id}`)
+                      navigate(`/profile/${user?.username}`)
                     },
                   },
                   {

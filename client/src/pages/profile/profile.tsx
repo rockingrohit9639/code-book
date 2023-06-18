@@ -77,7 +77,7 @@ export default function Profile() {
         <div className="col-span-1 self-start">
           {profile.data?.id === user.id ? (
             <UpdateProfileModal
-              profileId={profile.data?.id!}
+              profileUsername={profile.data?.username!}
               trigger={
                 <Button type="primary" ghost icon={<EditOutlined />}>
                   Update Profile
