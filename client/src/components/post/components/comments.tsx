@@ -1,30 +1,19 @@
 import { Button, Form, Input } from 'antd'
 import clsx from 'clsx'
 import { SendOutlined } from '@ant-design/icons'
-import dayjs from 'dayjs'
 import { useMutation, useQueryClient } from 'react-query'
 import { useMemo } from 'react'
 import { orderBy } from 'lodash'
 import { Comment as CommentType, Post } from '~/types/post'
 import useError from '~/hooks/use-error'
 import { addComment } from '~/queries/post'
+import Comment from './comment'
 
 type CommentsProps = {
   className?: string
   style?: React.CSSProperties
   postId: string
   comments: CommentType[]
-}
-
-function Comment({ comment }: { comment: CommentType }) {
-  return (
-    <div>
-      <div className="text-gray-500">
-        @{comment.commentBy.username} - <span className="text-sm">{dayjs(comment.createdAt).fromNow()}</span>
-      </div>
-      <div>{comment.comment}</div>
-    </div>
-  )
 }
 
 export default function Comments({ className, style, comments, postId }: CommentsProps) {

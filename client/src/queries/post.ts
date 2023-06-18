@@ -27,3 +27,8 @@ export async function addComment(postId: string, comment: string) {
   const { data } = await apiClient.post<Comment>(`/comment/${postId}`, { comment })
   return data
 }
+
+export async function deleteComment(commentId: string) {
+  const { data } = await apiClient.delete<Comment>(`/comment/${commentId}`)
+  return data
+}
