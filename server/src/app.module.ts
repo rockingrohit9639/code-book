@@ -7,9 +7,18 @@ import { AuthModule } from './auth/auth.module'
 import { FileModule } from './file/file.module'
 import { PostModule } from './post/post.module'
 import { LikeModule } from './like/like.module'
+import { CommentModule } from './comment/comment.module'
 
 @Module({
-  imports: [ConfigModule.forRoot(configOptions), UserModule, AuthModule, FileModule, PostModule, LikeModule],
+  imports: [
+    ConfigModule.forRoot(configOptions),
+    UserModule,
+    AuthModule,
+    FileModule,
+    PostModule,
+    LikeModule,
+    CommentModule,
+  ],
   controllers: [],
   providers: [PrismaService],
 })
