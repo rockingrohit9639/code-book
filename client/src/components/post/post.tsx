@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { AiFillHeart, AiOutlineComment, AiOutlineHeart, AiOutlineShareAlt } from 'react-icons/ai'
 import { useCallback, useEffect, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
-import Comments from './components/comments'
+import Comments from '../comments/comments'
 import { Post as PostType } from '~/types/post'
 import { fetchFileById } from '~/queries/file'
 import { likePost, unlikePost } from '~/queries/post'
@@ -81,7 +81,11 @@ export default function Post({ className, style, post }: PostProps) {
   }, [isPostLiked, post, likePostMutation, unLikePostMutation])
 
   return (
-    <div className={clsx('overflow-hidden rounded-2xl border-2 bg-white', className)} id={post.id} style={style}>
+    <div
+      className={clsx('overflow-hidden rounded-2xl border-2 bg-white', className)}
+      id={`post-${post.id}`}
+      style={style}
+    >
       <div className="space-y-2 p-4">
         <Link to={`/profile/${post.createdBy.username}`} className="text-gray-500">
           @{post.createdBy.username}
@@ -92,7 +96,9 @@ export default function Post({ className, style, post }: PostProps) {
         {postImage.isLoading ? (
           <div className="h-full w-full animate-pulse bg-gray-200" />
         ) : (
-          <img src={URL.createObjectURL(postImage.data!)} alt="code" className="h-full w-full object-contain" />
+          <Link to={`/post/${post.id}`} className="block">
+            <img src={URL.createObjectURL(postImage.data!)} alt="code" className="h-full w-full object-contain" />
+          </Link>
         )}
       </div>
 
@@ -119,9 +125,32 @@ export default function Post({ className, style, post }: PostProps) {
         </div>
       </div>
 
-      <div className="px-4 pb-4">{post.likes?.length ?? 0} likes</div>
+      <div className="flex items-center space-x-4 px-4 pb-4">
+        <div className="text-sm">{post.likes?.length ?? 0} likes</div>
+        <div className="text-sm">{post.comments?.length ?? 0} comments</div>
+      </div>
 
-      {commentVisible ? <Comments className="border-t-2" postId={post.id} comments={post.comments} /> : null}
+      {commentVisible ? (
+        <Comments
+          className="border-t-2"
+          postId={post.id}
+          comments={post.comments}
+          onCommentSuccess={(comment, queryClient) => {
+            queryClient.setQueryData<PostType[]>(['posts'], (prev) => {
+              if (!prev) return []
+              return prev.map((p) => {
+                if (p.id === post.id) {
+                  return {
+                    ...p,
+                    comments: [comment, ...p.comments],
+                  }
+                }
+                return p
+              })
+            })
+          }}
+        />
+      ) : null}
     </div>
   )
 }

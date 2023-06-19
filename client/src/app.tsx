@@ -10,6 +10,7 @@ import { useAuthContext } from './hooks/use-auth'
 const CreateNewPost = lazy(() => import('./pages/create-new-post'))
 const Home = lazy(() => import('./pages/home'))
 const Profile = lazy(() => import('./pages/profile'))
+const PostDetails = lazy(() => import('./pages/post-details'))
 
 function App() {
   const { authVerificationInProgress } = useAuthContext()
@@ -44,6 +45,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/create-new-post" element={<CreateNewPost />} />
         <Route path="/profile/:username" element={<Profile />} />
+        <Route path="/post/:id" element={<PostDetails />} />
       </Route>
 
       <Route path="/login" element={<Login />} />

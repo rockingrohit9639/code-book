@@ -11,6 +11,11 @@ export async function fetchPosts() {
   return data
 }
 
+export async function fetchPostDetails(id: string) {
+  const { data } = await apiClient.get<Post>(`/posts/${id}`)
+  return data
+}
+
 /** Likes */
 export async function likePost(postId: string) {
   const { data } = await apiClient.post<Like>(`/like/${postId}`)
