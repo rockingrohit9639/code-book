@@ -38,14 +38,16 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  files        File[]
-  posts        Post[]
-  followers    User[]    @relation("UserFollows", fields: [followerIds], references: [id])
-  followerIds  String[]  @db.ObjectId
-  following    User[]    @relation("UserFollows", fields: [followingIds], references: [id])
-  followingIds String[]  @db.ObjectId
-  likedPosts   Like[]
-  comments     Comment[]
+  files           File[]
+  posts           Post[]
+  followers       User[]         @relation("UserFollows", fields: [followerIds], references: [id])
+  followerIds     String[]       @db.ObjectId
+  following       User[]         @relation("UserFollows", fields: [followingIds], references: [id])
+  followingIds    String[]       @db.ObjectId
+  likedPosts      Like[]
+  comments        Comment[]
+  byNotifications Notification[] @relation(name: "NotificationBy")
+  toNotifications Notification[] @relation(name: "NotificationTo")
 }
 
 model File {
@@ -89,11 +91,24 @@ model Like {
 model Comment {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   createdAt DateTime @default(now())
-  updated   DateTime @updatedAt
+  updatedAt DateTime @updatedAt
 
   post        Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId      String @db.ObjectId
   comment     String
   commentBy   User   @relation(fields: [commentById], references: [id], onDelete: Cascade)
   commentById String @db.ObjectId
+}
+
+model Notification {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  notificationBy   User    @relation(fields: [notificationById], references: [id], onDelete: Cascade, name: "NotificationBy")
+  notificationById String  @db.ObjectId
+  notificationTo   User    @relation(fields: [notificationToId], references: [id], onDelete: Cascade, name: "NotificationTo")
+  notificationToId String  @db.ObjectId
+  content          String
+  isRead           Boolean @default(false)
 }
