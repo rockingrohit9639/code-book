@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { AiOutlineHome, AiOutlineMessage, AiOutlineNotification, AiOutlineLogout, AiOutlineUser } from 'react-icons/ai'
 import { Avatar, Dropdown } from 'antd'
 import { useAuthContext } from '../../hooks/use-auth'
+import NotificationsDrawer from '../notifications-drawer'
 
 type AppShellProps = {
   children: React.ReactElement
@@ -38,11 +39,13 @@ export default function AppShell({ children }: AppShellProps) {
                 <AiOutlineMessage className="h-6 w-6" />
               </Link>
             </li>
-            <li className="hover:text-primary transition-all delay-75 ease-in-out">
-              <Link to="/notifications">
-                <AiOutlineNotification className="h-6 w-6" />
-              </Link>
-            </li>
+            <NotificationsDrawer
+              trigger={
+                <li className="hover:text-primary cursor-pointer transition-all delay-75 ease-in-out">
+                  <AiOutlineNotification className="h-6 w-6" />
+                </li>
+              }
+            />
             <Dropdown
               trigger={['click']}
               menu={{

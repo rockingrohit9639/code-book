@@ -73,8 +73,9 @@ model Post {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  likes    Like[]
-  comments Comment[]
+  likes         Like[]
+  comments      Comment[]
+  notifications Notification[]
 }
 
 model Like {
@@ -111,4 +112,6 @@ model Notification {
   notificationToId String  @db.ObjectId
   content          String
   isRead           Boolean @default(false)
+  post             Post?   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId           String? @db.ObjectId
 }
