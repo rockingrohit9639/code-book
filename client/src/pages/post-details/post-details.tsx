@@ -1,11 +1,13 @@
-import { Dropdown, Result } from 'antd'
+import { Dropdown, Result, message } from 'antd'
+import { ItemType } from 'antd/es/menu/hooks/useItems'
 import dayjs from 'dayjs'
-import { useCallback, useEffect, useState } from 'react'
-import { AiFillHeart, AiOutlineCopy, AiOutlineHeart, AiOutlineShareAlt } from 'react-icons/ai'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { AiFillHeart, AiOutlineCopy, AiOutlineDelete, AiOutlineHeart, AiOutlineShareAlt } from 'react-icons/ai'
 import { HiOutlineDotsVertical } from 'react-icons/hi'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import Comments from '~/components/comments'
+import DeletePostModal from '~/components/delete-post-modal'
 import Loading from '~/components/loading'
 import Page from '~/components/page'
 import useError from '~/hooks/use-error'
@@ -21,6 +23,7 @@ export default function PostDetails() {
   const { id } = useParams() as { id: string }
   const { handleError } = useError()
   const queryClient = useQueryClient()
+  const navigate = useNavigate()
 
   const post = useQuery(['post', id], () => fetchPostDetails(id))
   const postImage = useQuery(['post-image', id], () => fetchFileById(post.data?.imageId!), {
@@ -66,6 +69,39 @@ export default function PostDetails() {
     }
   }, [isPostLiked, likePostMutation, unLikePostMutation, id])
 
+  const dropdownItems = useMemo(() => {
+    const items: ItemType[] = [
+      {
+        key: 'copyCodeSnippet',
+        label: 'Copy Code Snippet',
+        onClick: () => {
+          navigator.clipboard.writeText(post.data?.codeSnippet ?? '')
+          message.success('Code copied to clipboard successfully!')
+        },
+        icon: <AiOutlineCopy />,
+      },
+    ]
+
+    if (user.id === post.data?.createdById) {
+      items.push({
+        key: 'delete-post',
+        label: (
+          <DeletePostModal
+            postId={post.data.id}
+            trigger={<div>Delete Post</div>}
+            onSuccess={() => {
+              navigate('/', { replace: true })
+            }}
+          />
+        ),
+        danger: true,
+        icon: <AiOutlineDelete />,
+      })
+    }
+
+    return items
+  }, [post, user, navigate])
+
   if (post.isLoading) {
     return <Loading title="Loading post details..." />
   }
@@ -87,16 +123,7 @@ export default function PostDetails() {
           <Dropdown
             trigger={['click']}
             menu={{
-              items: [
-                {
-                  key: 'copyCodeSnippet',
-                  label: 'Copy Code Snippet',
-                  onClick: () => {
-                    navigator.clipboard.writeText(post.data?.codeSnippet ?? '')
-                  },
-                  icon: <AiOutlineCopy />,
-                },
-              ],
+              items: dropdownItems,
             }}
           >
             <HiOutlineDotsVertical className="cursor-pointer" />

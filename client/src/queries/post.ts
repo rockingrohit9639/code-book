@@ -11,6 +11,11 @@ export async function fetchPosts() {
   return data
 }
 
+export async function deletePost(id: string) {
+  const { data } = await apiClient.delete<Post>(`/posts/${id}`)
+  return data
+}
+
 export async function fetchPostDetails(id: string) {
   const { data } = await apiClient.get<Post>(`/posts/${id}`)
   return data
