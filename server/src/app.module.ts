@@ -8,6 +8,7 @@ import { FileModule } from './file/file.module'
 import { PostModule } from './post/post.module'
 import { LikeModule } from './like/like.module'
 import { CommentModule } from './comment/comment.module'
+import { NotificationModule } from './notification/notification.module'
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { CommentModule } from './comment/comment.module'
     PostModule,
     LikeModule,
     CommentModule,
+    NotificationModule,
   ],
   controllers: [],
   providers: [PrismaService],
