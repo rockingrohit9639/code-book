@@ -1,8 +1,10 @@
-import { Result } from 'antd'
+import { Dropdown, Result } from 'antd'
+import dayjs from 'dayjs'
 import { useCallback, useEffect, useState } from 'react'
-import { AiFillHeart, AiOutlineHeart, AiOutlineShareAlt } from 'react-icons/ai'
+import { AiFillHeart, AiOutlineCopy, AiOutlineHeart, AiOutlineShareAlt } from 'react-icons/ai'
+import { HiOutlineDotsVertical } from 'react-icons/hi'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
-import { useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import Comments from '~/components/comments'
 import Loading from '~/components/loading'
 import Page from '~/components/page'
@@ -74,6 +76,34 @@ export default function PostDetails() {
 
   return (
     <Page className="space-y-4 py-4">
+      <div className="flex items-center justify-between rounded-lg bg-white p-4 shadow-sm">
+        <div>
+          <Link to={`/profile/${post.data?.createdBy.username}`}>@{post.data?.createdBy?.username}</Link>
+          <div className="text-sm text-gray-500">
+            {post.data?.createdAt ? dayjs(post.data?.createdAt).fromNow() : null}
+          </div>
+        </div>
+        <div>
+          <Dropdown
+            trigger={['click']}
+            menu={{
+              items: [
+                {
+                  key: 'copyCodeSnippet',
+                  label: 'Copy Code Snippet',
+                  onClick: () => {
+                    navigator.clipboard.writeText(post.data?.codeSnippet ?? '')
+                  },
+                  icon: <AiOutlineCopy />,
+                },
+              ],
+            }}
+          >
+            <HiOutlineDotsVertical className="cursor-pointer" />
+          </Dropdown>
+        </div>
+      </div>
+
       {postImage.data ? (
         <img src={URL.createObjectURL(postImage.data)} alt="code" className="h-full w-full rounded object-contain" />
       ) : null}
