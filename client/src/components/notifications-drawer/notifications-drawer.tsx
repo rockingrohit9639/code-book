@@ -32,7 +32,7 @@ export default function NotificationsDrawer({ className, style, trigger }: Notif
     }
 
     return (
-      <div className="">
+      <div>
         {notifications.data?.length ? (
           notifications.data?.map((notification) => (
             <Notification key={notification.id} notification={notification} setIsDrawerOpen={setIsDrawerOpen} />

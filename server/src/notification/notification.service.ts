@@ -26,4 +26,12 @@ export class NotificationService {
       include: NOTIFICATION_INCLUDE_FIELDS,
     })
   }
+
+  markAsRead(id: string): Promise<Notification> {
+    return this.prismaService.notification.update({
+      where: { id },
+      data: { isRead: true },
+      include: NOTIFICATION_INCLUDE_FIELDS,
+    })
+  }
 }

@@ -1,7 +1,11 @@
 import { Avatar } from 'antd'
 import clsx from 'clsx'
 import dayjs from 'dayjs'
+import { useCallback } from 'react'
+import { useMutation, useQueryClient } from 'react-query'
 import { useNavigate } from 'react-router-dom'
+import useError from '~/hooks/use-error'
+import { markNotificationAsRead } from '~/queries/notification'
 import { Notification as NotificationType } from '~/types/notification'
 
 type NotificationProps = {
@@ -13,11 +17,31 @@ type NotificationProps = {
 
 export default function Notification({ className, style, notification, setIsDrawerOpen }: NotificationProps) {
   const navigate = useNavigate()
+  const { handleError } = useError()
+  const queryClient = useQueryClient()
 
-  const handleRoute = () => {
-    setIsDrawerOpen(false)
-    navigate(`/post/${notification.postId}`)
-  }
+  const markAsReadMutation = useMutation(markNotificationAsRead, {
+    onError: handleError,
+    onSuccess: (updatedNotification) => {
+      queryClient.setQueryData<NotificationType[]>(['notifications'], (prev) => {
+        if (!prev) return []
+
+        return prev.map((n) => {
+          if (n.id === updatedNotification.id) {
+            return updatedNotification
+          }
+          return n
+        })
+      })
+
+      setIsDrawerOpen(false)
+      navigate(`/post/${notification.postId}`)
+    },
+  })
+
+  const handleRoute = useCallback(() => {
+    markAsReadMutation.mutate(notification.id)
+  }, [markAsReadMutation, notification.id])
 
   return (
     <div
