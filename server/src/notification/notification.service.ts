@@ -23,6 +23,7 @@ export class NotificationService {
   getUserNotifications(user: UserWithoutSensitiveData): Promise<Notification[]> {
     return this.prismaService.notification.findMany({
       where: { notificationTo: { id: user.id } },
+      orderBy: { createdAt: 'desc' },
       include: NOTIFICATION_INCLUDE_FIELDS,
     })
   }

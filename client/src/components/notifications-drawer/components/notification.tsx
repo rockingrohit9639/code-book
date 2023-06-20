@@ -23,6 +23,7 @@ export default function Notification({ className, style, notification, setIsDraw
   const markAsReadMutation = useMutation(markNotificationAsRead, {
     onError: handleError,
     onSuccess: (updatedNotification) => {
+      setIsDrawerOpen(false)
       queryClient.setQueryData<NotificationType[]>(['notifications'], (prev) => {
         if (!prev) return []
 
@@ -34,7 +35,6 @@ export default function Notification({ className, style, notification, setIsDraw
         })
       })
 
-      setIsDrawerOpen(false)
       navigate(`/post/${notification.postId}`)
     },
   })

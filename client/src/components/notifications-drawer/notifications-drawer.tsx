@@ -1,8 +1,7 @@
-import { Badge, Drawer, Result } from 'antd'
 import { cloneElement, useMemo, useState } from 'react'
-import { useQuery } from 'react-query'
-import { getUserNotifications } from '~/queries/notification'
-import Loading from '../loading/loading'
+import { Badge, Drawer, Result } from 'antd'
+import { useNotifications } from '~/hooks/use-notifications'
+import Loading from '../loading'
 import { getErrorMessage } from '~/utils/error'
 import Notification from './components/notification'
 
@@ -14,27 +13,21 @@ type NotificationsDrawerProps = {
 
 export default function NotificationsDrawer({ className, style, trigger }: NotificationsDrawerProps) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
-
-  const notifications = useQuery(['notifications'], getUserNotifications)
-
-  const unreadNotifications = useMemo(
-    () => notifications.data?.filter((notification) => notification.isRead === false) ?? [],
-    [notifications],
-  )
+  const { isNotificationsLoading, notificationError, notifications, unreadNotifications } = useNotifications()
 
   const content = useMemo(() => {
-    if (notifications.isLoading) {
+    if (isNotificationsLoading) {
       return <Loading title="Loading notifications..." />
     }
 
-    if (notifications.error) {
-      return <Result subTitle={getErrorMessage(notifications.error)} />
+    if (notificationError) {
+      return <Result subTitle={getErrorMessage(notificationError)} />
     }
 
     return (
       <div>
-        {notifications.data?.length ? (
-          notifications.data?.map((notification) => (
+        {notifications?.length ? (
+          notifications?.map((notification) => (
             <Notification key={notification.id} notification={notification} setIsDrawerOpen={setIsDrawerOpen} />
           ))
         ) : (
@@ -42,7 +35,7 @@ export default function NotificationsDrawer({ className, style, trigger }: Notif
         )}
       </div>
     )
-  }, [notifications])
+  }, [isNotificationsLoading, notificationError, notifications])
 
   return (
     <>
