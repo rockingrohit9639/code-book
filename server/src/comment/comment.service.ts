@@ -27,7 +27,7 @@ export class CommentService {
         },
         include: COMMENT_INCLUDE_FIELDS,
       }),
-      this.notificationService.createNotification(user.id, post.createdById, 'commented on your post.', post.id),
+      this.notificationService.createNotification(user.id, [post.createdById], 'commented on your post.', post.id),
     ])
 
     return commentCreated

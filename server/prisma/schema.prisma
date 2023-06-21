@@ -38,16 +38,17 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  files           File[]
-  posts           Post[]
-  followers       User[]         @relation("UserFollows", fields: [followerIds], references: [id])
-  followerIds     String[]       @db.ObjectId
-  following       User[]         @relation("UserFollows", fields: [followingIds], references: [id])
-  followingIds    String[]       @db.ObjectId
-  likedPosts      Like[]
-  comments        Comment[]
-  byNotifications Notification[] @relation(name: "NotificationBy")
-  toNotifications Notification[] @relation(name: "NotificationTo")
+  files             File[]
+  posts             Post[]
+  followers         User[]         @relation("UserFollows", fields: [followerIds], references: [id])
+  followerIds       String[]       @db.ObjectId
+  following         User[]         @relation("UserFollows", fields: [followingIds], references: [id])
+  followingIds      String[]       @db.ObjectId
+  likedPosts        Like[]
+  comments          Comment[]
+  byNotifications   Notification[] @relation(name: "NotificationBy")
+  toNotifications   Notification[] @relation(name: "NotificationTo", references: [id], fields: [toNotificationIds])
+  toNotificationIds String[]       @db.ObjectId
 }
 
 model File {
@@ -106,12 +107,12 @@ model Notification {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  notificationBy   User    @relation(fields: [notificationById], references: [id], onDelete: Cascade, name: "NotificationBy")
-  notificationById String  @db.ObjectId
-  notificationTo   User    @relation(fields: [notificationToId], references: [id], onDelete: Cascade, name: "NotificationTo")
-  notificationToId String  @db.ObjectId
-  content          String
-  isRead           Boolean @default(false)
-  post             Post?   @relation(fields: [postId], references: [id], onDelete: Cascade)
-  postId           String? @db.ObjectId
+  notificationBy    User     @relation(fields: [notificationById], references: [id], onDelete: Cascade, name: "NotificationBy")
+  notificationById  String   @db.ObjectId
+  notificationTo    User[]   @relation(fields: [notificationToIds], references: [id], name: "NotificationTo")
+  notificationToIds String[] @db.ObjectId
+  content           String
+  isRead            Boolean  @default(false)
+  post              Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId            String?  @db.ObjectId
 }

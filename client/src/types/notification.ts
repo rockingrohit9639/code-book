@@ -5,8 +5,8 @@ export type Notification = {
   id: string
   notificationBy: User
   notificationById: string
-  notificationTo: User
-  notificationToId: string
+  notificationTo: User[]
+  notificationToIds: string[]
   content: string
   isRead: boolean
   post?: Post

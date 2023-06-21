@@ -12,10 +12,10 @@ export class NotificationService {
     private readonly notificationGateway: NotificationGateway,
   ) {}
 
-  async createNotification(by: string, to: string, content: string, postId?: string): Promise<Notification> {
+  async createNotification(by: string, to: string[], content: string, postId?: string): Promise<Notification> {
     const notification = await this.prismaService.notification.create({
       data: {
-        notificationToId: to,
+        notificationToIds: to,
         notificationById: by,
         content,
         postId,
@@ -23,13 +23,13 @@ export class NotificationService {
       include: NOTIFICATION_INCLUDE_FIELDS,
     })
 
-    this.notificationGateway.wss.to(`notification/${to}`).emit('notification', notification)
+    this.notificationGateway.wss.to(to.map((t) => `notification/${t}`)).emit('notification', notification)
     return notification
   }
 
   getUserNotifications(user: UserWithoutSensitiveData): Promise<Notification[]> {
     return this.prismaService.notification.findMany({
-      where: { notificationTo: { id: user.id } },
+      where: { notificationToIds: { has: user.id } },
       orderBy: { createdAt: 'desc' },
       include: NOTIFICATION_INCLUDE_FIELDS,
     })
