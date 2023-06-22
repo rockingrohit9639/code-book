@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom'
 import useError from '~/hooks/use-error'
 import { markNotificationAsRead } from '~/queries/notification'
 import { Notification as NotificationType } from '~/types/notification'
+import { getRouteByNotificationType } from '~/utils/notification'
 
 type NotificationProps = {
   className?: string
@@ -35,7 +36,7 @@ export default function Notification({ className, style, notification, setIsDraw
         })
       })
 
-      navigate(`/post/${notification.postId}`)
+      navigate(getRouteByNotificationType(updatedNotification))
     },
   })
 

@@ -31,7 +31,7 @@ export default function NotificationsDrawer({ className, style, trigger }: Notif
             <Notification key={notification.id} notification={notification} setIsDrawerOpen={setIsDrawerOpen} />
           ))
         ) : (
-          <div>No new notifications.</div>
+          <div className="flex w-full items-center justify-center p-4">No new notifications.</div>
         )}
       </div>
     )
