@@ -1,22 +1,99 @@
 import { Button, Result, Tabs } from 'antd'
-import { useQuery } from 'react-query'
+import { useMutation, useQuery, useQueryClient } from 'react-query'
 import { Link, useParams } from 'react-router-dom'
 import { AiOutlineGlobal, AiOutlineGithub, AiOutlineLinkedin } from 'react-icons/ai'
-import { EditOutlined } from '@ant-design/icons'
+import { EditOutlined, UserAddOutlined, UserDeleteOutlined } from '@ant-design/icons'
 import { BiBookmark, BiGridAlt } from 'react-icons/bi'
+import { useCallback, useMemo } from 'react'
+import invariant from 'tiny-invariant'
 import Loading from '~/components/loading'
 import Page from '~/components/page'
-import { fetchProfile } from '~/queries/user'
+import { fetchProfile, follow, unfollow } from '~/queries/user'
 import { getErrorMessage } from '~/utils/error'
 import UpdateProfileModal from '~/components/update-profile-modal'
 import { useUser } from '~/hooks/use-user'
 import Post from '~/components/post'
+import useError from '~/hooks/use-error'
+import { UserWithoutSensitiveData } from '~/types/user'
 
 export default function Profile() {
   const { username } = useParams() as { username: string }
   const { user } = useUser()
-
+  const { handleError } = useError()
+  const queryClient = useQueryClient()
   const profile = useQuery(['profile', username], () => fetchProfile(username))
+
+  const followMutation = useMutation(follow, {
+    onError: handleError,
+    onSuccess: () => {
+      /** Saving the followed user in current user's following */
+      queryClient.setQueryData<UserWithoutSensitiveData>(['logged-in'], (prevData) => {
+        if (!prevData) {
+          return {} as UserWithoutSensitiveData
+        }
+
+        invariant(profile.data?.id, 'Profile not found!')
+        return { ...prevData, followingIds: [...prevData.followingIds, profile.data.id] }
+      })
+
+      /** Saving the current user in followed user's followers */
+      queryClient.setQueryData<UserWithoutSensitiveData>(['profile', username], (prevData) => {
+        if (!prevData) {
+          return {} as UserWithoutSensitiveData
+        }
+
+        invariant(profile.data?.id, 'Profile not found!')
+        return { ...prevData, followerIds: [...prevData.followingIds, profile.data.id] }
+      })
+    },
+  })
+  const unfollowMutation = useMutation(unfollow, {
+    onError: handleError,
+    onSuccess: () => {
+      /** Removing the un-followed user from current user's following */
+      queryClient.setQueryData<UserWithoutSensitiveData>(['logged-in'], (prevData) => {
+        if (!prevData) {
+          return {} as UserWithoutSensitiveData
+        }
+
+        return { ...prevData, followingIds: prevData.followingIds.filter((id) => id !== profile.data?.id) }
+      })
+
+      /** Removing the current user from un-followed user's followers */
+      queryClient.setQueryData<UserWithoutSensitiveData>(['profile', username], (prevData) => {
+        if (!prevData) {
+          return {} as UserWithoutSensitiveData
+        }
+
+        return { ...prevData, followerIds: prevData.followerIds.filter((id) => id !== user.id) }
+      })
+    },
+  })
+
+  const showFollowButton = useMemo(() => {
+    if (!user) {
+      return false
+    }
+
+    if (user.username === username) {
+      return false
+    }
+
+    if (user.followingIds.includes(profile.data?.id ?? '')) {
+      return false
+    }
+
+    return true
+  }, [user, username, profile.data?.id])
+
+  const handleFollowUnfollow = useCallback(() => {
+    invariant(profile.data?.id, 'Profile not found!')
+    if (showFollowButton) {
+      followMutation.mutate(profile.data.id)
+    } else {
+      unfollowMutation.mutate(profile.data.id)
+    }
+  }, [followMutation, unfollowMutation, profile.data?.id, showFollowButton])
 
   if (profile.isLoading) {
     return <Loading title="Loading user profile...." />
@@ -46,11 +123,11 @@ export default function Profile() {
               <div>posts</div>
             </div>
             <div className="flex gap-2">
-              <div className="font-medium">{profile.data?.followers?.length ?? 0}</div>
+              <div className="font-medium">{profile.data?.followerIds.length ?? 0}</div>
               <div>followers</div>
             </div>
             <div className="flex gap-2">
-              <div className="font-medium">{profile.data?.following?.length ?? 0}</div>
+              <div className="font-medium">{profile.data?.followingIds?.length ?? 0}</div>
               <div>following</div>
             </div>
           </div>
@@ -72,6 +149,17 @@ export default function Profile() {
               </Link>
             ) : null}
           </div>
+
+          {showFollowButton ? (
+            <Button type="primary" icon={<UserAddOutlined />} onClick={handleFollowUnfollow}>
+              Follow
+            </Button>
+          ) : null}
+          {!showFollowButton ? (
+            <Button icon={<UserDeleteOutlined />} onClick={handleFollowUnfollow}>
+              Unfollow
+            </Button>
+          ) : null}
         </div>
 
         <div className="col-span-1 self-start">

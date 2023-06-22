@@ -13,6 +13,7 @@ import { UserWithoutSensitiveData } from './user.type'
 import { SignupDto } from '~/auth/auth.dto'
 import { USER_SELECT_FIELDS } from './user.fields'
 import { UpdateUserProfileDto } from './user.dto'
+import { POST_INCLUDE_FIELDS } from '~/post/post.fields'
 
 @Injectable()
 export class UserService {
@@ -35,7 +36,10 @@ export class UserService {
   }
 
   async findOneByUsername(username: string): Promise<UserWithoutSensitiveData> {
-    const user = await this.prismaService.user.findFirst({ where: { username }, select: USER_SELECT_FIELDS })
+    const user = await this.prismaService.user.findFirst({
+      where: { username },
+      select: { ...USER_SELECT_FIELDS, posts: { include: POST_INCLUDE_FIELDS } },
+    })
     if (!user) {
       throw new NotFoundException('User not found')
     }

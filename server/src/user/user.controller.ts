@@ -35,7 +35,7 @@ export class UserController {
   }
 
   /** Followers and Followings */
-  @Post('/followers/:userId')
+  @Post('follow/:userId')
   follow(
     @Param('userId') userId: string,
     @GetUser() currentUser: UserWithoutSensitiveData,
@@ -43,7 +43,7 @@ export class UserController {
     return this.userService.follow(userId, currentUser)
   }
 
-  @Post('followers/unfollow/:userId')
+  @Post('unfollow/:userId')
   unfollow(
     @Param('userId') userId: string,
     @GetUser() currentUser: UserWithoutSensitiveData,
