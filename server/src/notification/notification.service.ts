@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import { Notification } from '@prisma/client'
+import { Notification, NotificationType } from '@prisma/client'
 import { PrismaService } from '~/prisma/prisma.service'
 import { NOTIFICATION_INCLUDE_FIELDS } from './notification.fields'
 import { UserWithoutSensitiveData } from '~/user/user.type'
@@ -12,13 +12,20 @@ export class NotificationService {
     private readonly notificationGateway: NotificationGateway,
   ) {}
 
-  async createNotification(by: string, to: string[], content: string, postId?: string): Promise<Notification> {
+  async createNotification(
+    by: string,
+    to: string[],
+    content: string,
+    type: NotificationType,
+    postId?: string,
+  ): Promise<Notification> {
     const notification = await this.prismaService.notification.create({
       data: {
         notificationToIds: to,
         notificationById: by,
         content,
         postId,
+        type,
       },
       include: NOTIFICATION_INCLUDE_FIELDS,
     })

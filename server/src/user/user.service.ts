@@ -14,10 +14,14 @@ import { SignupDto } from '~/auth/auth.dto'
 import { USER_SELECT_FIELDS } from './user.fields'
 import { UpdateUserProfileDto } from './user.dto'
 import { POST_INCLUDE_FIELDS } from '~/post/post.fields'
+import { NotificationService } from '~/notification/notification.service'
 
 @Injectable()
 export class UserService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly notificationService: NotificationService,
+  ) {}
 
   findAll(): Promise<UserWithoutSensitiveData[]> {
     return this.prismaService.user.findMany({
@@ -172,6 +176,7 @@ export class UserService {
         data: { following: { connect: { id: user.id } } },
         select: USER_SELECT_FIELDS,
       }),
+      this.notificationService.createNotification(currentUser.id, [user.id], 'started following you.', 'FOLLOW'),
     ])
 
     return [updatedUser, updatedCurrentUser]

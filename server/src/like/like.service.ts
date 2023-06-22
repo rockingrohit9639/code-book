@@ -24,7 +24,7 @@ export class LikeService {
           likedBy: { connect: { id: user.id } },
         },
       }),
-      this.notificationService.createNotification(user.id, [post.createdById], 'liked your post.', post.id),
+      this.notificationService.createNotification(user.id, [post.createdById], 'liked your post.', 'LIKE', post.id),
     ])
 
     return likeCreated

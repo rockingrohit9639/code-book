@@ -102,17 +102,24 @@ model Comment {
   commentById String @db.ObjectId
 }
 
+enum NotificationType {
+  LIKE
+  COMMENT
+  FOLLOW
+}
+
 model Notification {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  notificationBy    User     @relation(fields: [notificationById], references: [id], onDelete: Cascade, name: "NotificationBy")
-  notificationById  String   @db.ObjectId
-  notificationTo    User[]   @relation(fields: [notificationToIds], references: [id], name: "NotificationTo")
-  notificationToIds String[] @db.ObjectId
+  notificationBy    User             @relation(fields: [notificationById], references: [id], onDelete: Cascade, name: "NotificationBy")
+  notificationById  String           @db.ObjectId
+  notificationTo    User[]           @relation(fields: [notificationToIds], references: [id], name: "NotificationTo")
+  notificationToIds String[]         @db.ObjectId
   content           String
-  isRead            Boolean  @default(false)
-  post              Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
-  postId            String?  @db.ObjectId
+  isRead            Boolean          @default(false)
+  post              Post?            @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId            String?          @db.ObjectId
+  type              NotificationType
 }
