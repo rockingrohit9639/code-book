@@ -8,7 +8,7 @@ import { useCallback, useMemo } from 'react'
 import invariant from 'tiny-invariant'
 import Loading from '~/components/loading'
 import Page from '~/components/page'
-import { fetchProfile, follow, unfollow } from '~/queries/user'
+import { fetchProfile, follow, removeFollower, unfollow } from '~/queries/user'
 import { getErrorMessage } from '~/utils/error'
 import UpdateProfileModal from '~/components/update-profile-modal'
 import { useUser } from '~/hooks/use-user'
@@ -43,7 +43,7 @@ export default function Profile() {
         }
 
         invariant(profile.data?.id, 'Profile not found!')
-        return { ...prevData, followerIds: [...prevData.followingIds, profile.data.id] }
+        return { ...prevData, followerIds: [...prevData.followerIds, profile.data.id] }
       })
     },
   })
@@ -69,6 +69,28 @@ export default function Profile() {
       })
     },
   })
+  const removeFollowerMutation = useMutation(removeFollower, {
+    onError: handleError,
+    onSuccess: () => {
+      /** Removing the profile user from current user's followers */
+      queryClient.setQueryData<UserWithoutSensitiveData>(['logged-in'], (prevData) => {
+        if (!prevData) {
+          return {} as UserWithoutSensitiveData
+        }
+
+        return { ...prevData, followerIds: prevData.followerIds.filter((id) => id !== profile.data?.id) }
+      })
+
+      /** Removing the current user from profile user's followings */
+      queryClient.setQueryData<UserWithoutSensitiveData>(['profile', username], (prevData) => {
+        if (!prevData) {
+          return {} as UserWithoutSensitiveData
+        }
+
+        return { ...prevData, followingIds: prevData.followingIds.filter((id) => id !== user.id) }
+      })
+    },
+  })
 
   const showFollowButton = useMemo(() => {
     if (!user) {
@@ -85,6 +107,38 @@ export default function Profile() {
 
     return true
   }, [user, username, profile.data?.id])
+
+  const showUnfollowButton = useMemo(() => {
+    if (!user) {
+      return false
+    }
+
+    if (user.username === username) {
+      return false
+    }
+
+    if (!user.followingIds.includes(profile.data?.id ?? '')) {
+      return false
+    }
+
+    return true
+  }, [profile.data?.id, user, username])
+
+  const showRemoveFollowerButton = useMemo(() => {
+    if (!user) {
+      return false
+    }
+
+    if (user.username === username) {
+      return false
+    }
+
+    if (!user.followerIds.includes(profile.data?.id ?? '')) {
+      return false
+    }
+
+    return true
+  }, [profile.data?.id, user, username])
 
   const handleFollowUnfollow = useCallback(() => {
     invariant(profile.data?.id, 'Profile not found!')
@@ -150,16 +204,31 @@ export default function Profile() {
             ) : null}
           </div>
 
-          {showFollowButton ? (
-            <Button type="primary" icon={<UserAddOutlined />} onClick={handleFollowUnfollow}>
-              Follow
-            </Button>
-          ) : null}
-          {!showFollowButton ? (
-            <Button icon={<UserDeleteOutlined />} onClick={handleFollowUnfollow}>
-              Unfollow
-            </Button>
-          ) : null}
+          <div className="flex items-center space-x-2">
+            {showFollowButton ? (
+              <Button type="primary" icon={<UserAddOutlined />} onClick={handleFollowUnfollow}>
+                Follow
+              </Button>
+            ) : null}
+            {showUnfollowButton ? (
+              <Button icon={<UserDeleteOutlined />} onClick={handleFollowUnfollow}>
+                Unfollow
+              </Button>
+            ) : null}
+            {showRemoveFollowerButton ? (
+              <Button
+                danger
+                icon={<UserDeleteOutlined />}
+                onClick={() => {
+                  if (profile.data?.id) {
+                    removeFollowerMutation.mutate(profile.data.id)
+                  }
+                }}
+              >
+                Remove Follower
+              </Button>
+            ) : null}
+          </div>
         </div>
 
         <div className="col-span-1 self-start">
