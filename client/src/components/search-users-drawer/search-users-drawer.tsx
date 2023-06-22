@@ -46,9 +46,10 @@ export default function SearchUsersDrawer({ className, style, trigger }: SearchU
           <div className="space-y-2">
             {users.data?.map((user) => (
               <div
-                className="cursor-pointer"
+                className="cursor-pointer rounded-lg border-2 px-4 py-2"
                 key={user.id}
                 onClick={() => {
+                  setQuery('')
                   setIsDrawerOpen(false)
                   navigate(`/profile/${user.username}`)
                 }}
