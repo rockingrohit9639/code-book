@@ -12,8 +12,8 @@ export class PostController {
   constructor(private readonly postService: PostService) {}
 
   @Get()
-  findAll(): Promise<Post[]> {
-    return this.postService.findAll()
+  findAll(@GetUser() user: UserWithoutSensitiveData): Promise<Post[]> {
+    return this.postService.findAll(user)
   }
 
   @Get(':id')

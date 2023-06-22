@@ -10,8 +10,9 @@ import { FileService } from '~/file/file.service'
 export class PostService {
   constructor(private readonly prismaService: PrismaService, private readonly fileService: FileService) {}
 
-  findAll(): Promise<Post[]> {
+  findAll(user: UserWithoutSensitiveData): Promise<Post[]> {
     return this.prismaService.post.findMany({
+      where: { createdBy: { followerIds: { has: user.id } } },
       include: POST_INCLUDE_FIELDS,
       orderBy: {
         createdAt: 'desc',
