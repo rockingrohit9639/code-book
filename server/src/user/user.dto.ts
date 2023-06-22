@@ -60,3 +60,8 @@ export class UpdateUserProfileDto {
   @IsUrl()
   linkedin?: string
 }
+
+export class SearchUserDto {
+  @IsString()
+  query: string
+}

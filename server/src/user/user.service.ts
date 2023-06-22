@@ -12,7 +12,7 @@ import { PrismaService } from '~/prisma/prisma.service'
 import { UserWithoutSensitiveData } from './user.type'
 import { SignupDto } from '~/auth/auth.dto'
 import { USER_SELECT_FIELDS } from './user.fields'
-import { UpdateUserProfileDto } from './user.dto'
+import { SearchUserDto, UpdateUserProfileDto } from './user.dto'
 import { POST_INCLUDE_FIELDS } from '~/post/post.fields'
 import { NotificationService } from '~/notification/notification.service'
 
@@ -22,6 +22,16 @@ export class UserService {
     private readonly prismaService: PrismaService,
     private readonly notificationService: NotificationService,
   ) {}
+
+  searchUsers(dto: SearchUserDto, user: UserWithoutSensitiveData): Promise<UserWithoutSensitiveData[]> {
+    return this.prismaService.user.findMany({
+      where: {
+        role: { not: 'ADMIN' },
+        username: { contains: dto.query },
+        NOT: { id: user.id },
+      },
+    })
+  }
 
   findAll(): Promise<UserWithoutSensitiveData[]> {
     return this.prismaService.user.findMany({
@@ -155,10 +165,7 @@ export class UserService {
     return false
   }
 
-  /**
-   * Followers and Followings
-   */
-
+  /** Followers and Followings */
   async follow(
     userId: string,
     currentUser: UserWithoutSensitiveData,

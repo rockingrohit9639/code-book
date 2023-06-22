@@ -30,3 +30,8 @@ export async function removeFollower(id: string) {
   const { data } = await apiClient.delete<UserWithoutSensitiveData>(`/user/followers/${id}`)
   return data
 }
+
+export async function searchUsers(query: string) {
+  const { data } = await apiClient.get<UserWithoutSensitiveData[]>('/user/search', { params: { query } })
+  return data
+}

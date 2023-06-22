@@ -1,9 +1,17 @@
 import React from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { AiOutlineHome, AiOutlineMessage, AiOutlineNotification, AiOutlineLogout, AiOutlineUser } from 'react-icons/ai'
+import {
+  AiOutlineHome,
+  AiOutlineMessage,
+  AiOutlineNotification,
+  AiOutlineLogout,
+  AiOutlineUser,
+  AiOutlineSearch,
+} from 'react-icons/ai'
 import { Avatar, Dropdown } from 'antd'
 import { useAuthContext } from '../../hooks/use-auth'
 import NotificationsDrawer from '../notifications-drawer'
+import SearchUsersDrawer from '../search-users-drawer'
 
 type AppShellProps = {
   children: React.ReactElement
@@ -43,6 +51,13 @@ export default function AppShell({ children }: AppShellProps) {
               trigger={
                 <li className="hover:text-primary cursor-pointer transition-all delay-75 ease-in-out">
                   <AiOutlineNotification className="h-6 w-6" />
+                </li>
+              }
+            />
+            <SearchUsersDrawer
+              trigger={
+                <li className="hover:text-primary cursor-pointer transition-all delay-75 ease-in-out">
+                  <AiOutlineSearch className="h-6 w-6" />
                 </li>
               }
             />
