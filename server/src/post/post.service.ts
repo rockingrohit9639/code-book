@@ -17,7 +17,7 @@ export class PostService {
 
   findAll(user: UserWithoutSensitiveData): Promise<Post[]> {
     return this.prismaService.post.findMany({
-      where: { createdBy: { followerIds: { has: user.id } } },
+      where: { OR: [{ createdBy: { followerIds: { has: user.id } } }, { createdBy: { id: user.id } }] },
       include: POST_INCLUDE_FIELDS,
       orderBy: {
         createdAt: 'desc',

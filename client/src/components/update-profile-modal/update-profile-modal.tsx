@@ -22,7 +22,7 @@ export default function UpdateProfileModal({ className, style, trigger, profileU
 
   const profile = useQuery(['profile', profileUsername], () => fetchProfile(profileUsername))
 
-  const updateProfileMutation = useMutation((dto: UpdateProfileDto) => updateProfile(profileUsername, dto), {
+  const updateProfileMutation = useMutation((dto: UpdateProfileDto) => updateProfile(profile.data?.id!, dto), {
     onError: handleError,
     onSuccess: (updatedProfile) => {
       queryClient.setQueryData(['profile', profileUsername], updatedProfile)
