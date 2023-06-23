@@ -3,6 +3,7 @@ import { Notification } from '~/types/notification'
 export function getRouteByNotificationType(notification: Notification): string {
   switch (notification.type) {
     case 'LIKE':
+    case 'POST_UPLOAD':
     case 'COMMENT': {
       return `/post/${notification.postId}`
     }

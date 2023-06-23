@@ -106,6 +106,7 @@ enum NotificationType {
   LIKE
   COMMENT
   FOLLOW
+  POST_UPLOAD
 }
 
 model Notification {

@@ -1,7 +1,7 @@
 import { Post } from './post'
 import { User } from './user'
 
-export type NotificationType = 'LIKE' | 'COMMENT' | 'FOLLOW'
+export type NotificationType = 'LIKE' | 'COMMENT' | 'FOLLOW' | 'POST_UPLOAD'
 
 export type Notification = {
   id: string
