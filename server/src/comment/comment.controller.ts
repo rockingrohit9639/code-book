@@ -21,7 +21,7 @@ export class CommentController {
   }
 
   @Delete(':id')
-  deleteComment(@Param('id') id: string): Promise<Comment> {
-    return this.commentService.deleteComment(id)
+  deleteComment(@Param('id') id: string, @GetUser() user: UserWithoutSensitiveData): Promise<Comment> {
+    return this.commentService.deleteComment(id, user)
   }
 }

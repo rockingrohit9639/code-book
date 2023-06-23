@@ -8,7 +8,7 @@ import Post from '~/components/post'
 import useError from '~/hooks/use-error'
 import { useGlobalSocket } from '~/hooks/use-global-socket'
 import { fetchPosts } from '~/queries/post'
-import { Like, Post as PostType } from '~/types/post'
+import { Comment, Like, Post as PostType } from '~/types/post'
 
 export default function Home() {
   const { getErrorMessage } = useError()
@@ -50,9 +50,43 @@ export default function Home() {
         })
       })
 
+      /** Listening to new comments */
+      const commentEvent = socket.on('comment', (newComment: Comment) => {
+        queryClient.setQueryData<PostType[]>(['posts'], (oldPosts) => {
+          if (!oldPosts) {
+            return []
+          }
+
+          return oldPosts.map((post) => {
+            if (post.id === newComment.postId) {
+              return { ...post, comments: [...post.comments, newComment] }
+            }
+            return post
+          })
+        })
+      })
+
+      /** Listening to remove comments */
+      const removeCommentEvent = socket.on('remove-comment', (deletedComment: Comment) => {
+        queryClient.setQueryData<PostType[]>(['posts'], (oldPosts) => {
+          if (!oldPosts) {
+            return []
+          }
+
+          return oldPosts.map((post) => {
+            if (post.id === deletedComment.postId) {
+              return { ...post, comments: post.comments.filter((comment) => comment.id !== deletedComment.id) }
+            }
+            return post
+          })
+        })
+      })
+
       return () => {
         likeEvent.off()
         dislikeEvent.off()
+        commentEvent.off()
+        removeCommentEvent.off()
       }
     },
     [queryClient, socket],
