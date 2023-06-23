@@ -9,6 +9,7 @@ import { PostModule } from './post/post.module'
 import { LikeModule } from './like/like.module'
 import { CommentModule } from './comment/comment.module'
 import { NotificationModule } from './notification/notification.module'
+import { SocketModule } from './socket/socket.module'
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { NotificationModule } from './notification/notification.module'
     LikeModule,
     CommentModule,
     NotificationModule,
+    SocketModule,
   ],
   controllers: [],
   providers: [PrismaService],

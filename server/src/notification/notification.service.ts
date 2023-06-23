@@ -3,14 +3,11 @@ import { Notification, NotificationType } from '@prisma/client'
 import { PrismaService } from '~/prisma/prisma.service'
 import { NOTIFICATION_INCLUDE_FIELDS } from './notification.fields'
 import { UserWithoutSensitiveData } from '~/user/user.type'
-import { NotificationGateway } from './notification.gateway'
+import { SocketGateway } from '../socket/socket.gateway'
 
 @Injectable()
 export class NotificationService {
-  constructor(
-    private readonly prismaService: PrismaService,
-    private readonly notificationGateway: NotificationGateway,
-  ) {}
+  constructor(private readonly prismaService: PrismaService, private readonly socketGateway: SocketGateway) {}
 
   async createNotification(
     by: string,
@@ -30,7 +27,7 @@ export class NotificationService {
       include: NOTIFICATION_INCLUDE_FIELDS,
     })
 
-    this.notificationGateway.wss.to(to.map((t) => `notification/${t}`)).emit('notification', notification)
+    this.socketGateway.wss.volatile.to(to.map((t) => `/global/${t}`)).emit('notification', notification)
     return notification
   }
 

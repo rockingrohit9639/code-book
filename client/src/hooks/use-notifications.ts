@@ -1,12 +1,12 @@
 import { useEffect, useMemo } from 'react'
 import { useQuery, useQueryClient } from 'react-query'
 import { getUserNotifications } from '~/queries/notification'
-import { useSocket } from './use-socket'
+import { useGlobalSocket } from './use-global-socket'
 import { Notification } from '~/types/notification'
 
 export function useNotifications() {
   const notifications = useQuery(['notifications'], getUserNotifications)
-  const { socket } = useSocket('/notification')
+  const { socket } = useGlobalSocket()
   const queryClient = useQueryClient()
 
   useEffect(

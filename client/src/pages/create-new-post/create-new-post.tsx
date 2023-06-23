@@ -57,14 +57,14 @@ export default function CreateNewPost() {
       >
         <Form.Item
           name="title"
-          className="mb-0 rounded-md p-4 shadow"
+          className="mb-0 rounded-md bg-white p-4 shadow"
           label="Title"
           rules={[{ required: true, message: 'Title is required!' }]}
         >
           <Input placeholder="Title" />
         </Form.Item>
 
-        <EditorOptions form={form} className="rounded-md p-4 shadow" />
+        <EditorOptions form={form} className="rounded-md bg-white p-4 shadow" />
 
         <Form.Item shouldUpdate noStyle>
           {({ getFieldValue, setFieldValue }) => {
@@ -89,7 +89,7 @@ export default function CreateNewPost() {
             }
 
             return (
-              <Form.Item name="codeSnippet">
+              <Form.Item name="codeSnippet" className="bg-white">
                 <div className="flex items-center justify-center rounded-md border-2 p-4">
                   <div
                     ref={editorRef}

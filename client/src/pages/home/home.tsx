@@ -1,16 +1,62 @@
 import { Result } from 'antd'
 import { range } from 'lodash'
-import { useMemo } from 'react'
-import { useQuery } from 'react-query'
+import { useEffect, useMemo } from 'react'
+import { useQuery, useQueryClient } from 'react-query'
 import { Link } from 'react-router-dom'
 import Page from '~/components/page'
 import Post from '~/components/post'
 import useError from '~/hooks/use-error'
+import { useGlobalSocket } from '~/hooks/use-global-socket'
 import { fetchPosts } from '~/queries/post'
+import { Like, Post as PostType } from '~/types/post'
 
 export default function Home() {
   const { getErrorMessage } = useError()
   const posts = useQuery(['posts'], fetchPosts)
+  const { socket } = useGlobalSocket()
+  const queryClient = useQueryClient()
+
+  useEffect(
+    function listenToLikesOrDislikes() {
+      /** Listening to new likes */
+      const likeEvent = socket.on('like', (newLike: Like) => {
+        queryClient.setQueryData<PostType[]>(['posts'], (oldPosts) => {
+          if (!oldPosts) {
+            return []
+          }
+
+          return oldPosts.map((post) => {
+            if (post.id === newLike.postId) {
+              return { ...post, likes: [...post.likes, newLike] }
+            }
+            return post
+          })
+        })
+      })
+
+      /** Listening to dislikes */
+      const dislikeEvent = socket.on('dislike', (dislike: Like) => {
+        queryClient.setQueryData<PostType[]>(['posts'], (oldPosts) => {
+          if (!oldPosts) {
+            return []
+          }
+
+          return oldPosts.map((post) => {
+            if (post.id === dislike.postId) {
+              return { ...post, likes: post.likes.filter((like) => like.id !== dislike.id) }
+            }
+            return post
+          })
+        })
+      })
+
+      return () => {
+        likeEvent.off()
+        dislikeEvent.off()
+      }
+    },
+    [queryClient, socket],
+  )
 
   const content = useMemo(() => {
     if (posts.isLoading) {
