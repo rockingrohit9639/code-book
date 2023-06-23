@@ -9,9 +9,10 @@ type NotificationsDrawerProps = {
   className?: string
   style?: React.CSSProperties
   trigger: React.ReactElement<{ onClick: () => void }>
+  badgeClassName?: string
 }
 
-export default function NotificationsDrawer({ className, style, trigger }: NotificationsDrawerProps) {
+export default function NotificationsDrawer({ className, style, trigger, badgeClassName }: NotificationsDrawerProps) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const { isNotificationsLoading, notificationError, notifications, unreadNotifications } = useNotifications()
 
@@ -39,7 +40,7 @@ export default function NotificationsDrawer({ className, style, trigger }: Notif
 
   return (
     <>
-      <Badge count={unreadNotifications.length}>
+      <Badge count={unreadNotifications.length} className={badgeClassName}>
         {cloneElement(trigger, {
           onClick: () => {
             setIsDrawerOpen(true)

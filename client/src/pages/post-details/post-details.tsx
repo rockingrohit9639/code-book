@@ -116,7 +116,7 @@ export default function PostDetails() {
   }
 
   return (
-    <Page className="space-y-4 py-4">
+    <Page className="space-y-4 p-4">
       <div className="flex items-center justify-between rounded-lg bg-white p-4 shadow-sm">
         <div>
           <Link to={`/profile/${post?.createdBy.username}`}>@{post?.createdBy?.username}</Link>

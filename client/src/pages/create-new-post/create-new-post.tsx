@@ -38,7 +38,7 @@ export default function CreateNewPost() {
   )
 
   return (
-    <Page className="py-4" isHeroSection>
+    <Page className="p-4">
       <div className="mb-4 border-b pb-4 text-2xl font-bold">Create new post</div>
 
       <Form

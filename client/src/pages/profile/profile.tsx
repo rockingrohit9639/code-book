@@ -158,7 +158,7 @@ export default function Profile() {
   }
 
   return (
-    <Page className="space-y-4 py-4">
+    <Page className="space-y-4 p-4">
       <div className="grid grid-cols-6 items-center gap-8">
         <img src="/code.png" className="col-span-2 h-60 w-60 rounded-full object-cover" />
 

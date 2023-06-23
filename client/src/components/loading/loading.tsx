@@ -1,6 +1,5 @@
 import { Spin } from 'antd'
 import clsx from 'clsx'
-import AppShell from '../app-shell/app-shell'
 
 type LoadingProps = {
   className?: string
@@ -10,10 +9,7 @@ type LoadingProps = {
 
 export default function Loading({ className, style, title = 'Loading...' }: LoadingProps) {
   return (
-    <div
-      className={clsx('flex items-center justify-center', className)}
-      style={{ ...style, minHeight: `calc(100vh - ${AppShell.NAVBAR_HEIGHT})` }}
-    >
+    <div className={clsx('flex h-screen items-center justify-center', className)} style={style}>
       <Spin tip={title} />
     </div>
   )
