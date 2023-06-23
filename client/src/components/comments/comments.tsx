@@ -1,5 +1,4 @@
 import { Button, Form, Input } from 'antd'
-import clsx from 'clsx'
 import { SendOutlined } from '@ant-design/icons'
 import { QueryClient, useMutation, useQueryClient } from 'react-query'
 import { useMemo } from 'react'
@@ -37,7 +36,7 @@ export default function Comments({ className, style, comments, postId, onComment
   }, [comments])
 
   return (
-    <div className={clsx('p-4', className)} style={style}>
+    <div className={className} style={style}>
       <Form
         form={form}
         className="mb-4 flex items-center gap-2"

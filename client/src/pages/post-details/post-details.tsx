@@ -11,9 +11,10 @@ import DeletePostModal from '~/components/delete-post-modal'
 import Loading from '~/components/loading'
 import Page from '~/components/page'
 import useError from '~/hooks/use-error'
+import { usePosts } from '~/hooks/use-posts'
 import { useUser } from '~/hooks/use-user'
 import { fetchFileById } from '~/queries/file'
-import { fetchPostDetails, likePost, unlikePost } from '~/queries/post'
+import { likePost, unlikePost } from '~/queries/post'
 import { Post } from '~/types/post'
 import { getErrorMessage } from '~/utils/error'
 
@@ -24,10 +25,14 @@ export default function PostDetails() {
   const { handleError } = useError()
   const queryClient = useQueryClient()
   const navigate = useNavigate()
+  const { posts, isLoading, error } = usePosts()
 
-  const post = useQuery(['post', id], () => fetchPostDetails(id))
-  const postImage = useQuery(['post-image', id], () => fetchFileById(post.data?.imageId!), {
-    enabled: Boolean(post.data?.imageId),
+  const post = useMemo(() => {
+    return posts?.find((p) => p.id === id)
+  }, [posts, id])
+
+  const postImage = useQuery(['post-image', id], () => fetchFileById(post?.imageId!), {
+    enabled: Boolean(post?.imageId),
   })
 
   const likePostMutation = useMutation(likePost, {
@@ -56,7 +61,7 @@ export default function PostDetails() {
 
   useEffect(
     function checkIsPostLiked() {
-      setIsPostLiked(post.data?.likes?.some((like) => like.likedById === user.id))
+      setIsPostLiked(post?.likes?.some((like) => like.likedById === user.id))
     },
     [post, user],
   )
@@ -75,19 +80,19 @@ export default function PostDetails() {
         key: 'copyCodeSnippet',
         label: 'Copy Code Snippet',
         onClick: () => {
-          navigator.clipboard.writeText(post.data?.codeSnippet ?? '')
+          navigator.clipboard.writeText(post?.codeSnippet ?? '')
           message.success('Code copied to clipboard successfully!')
         },
         icon: <AiOutlineCopy />,
       },
     ]
 
-    if (user.id === post.data?.createdById) {
+    if (user.id === post?.createdById) {
       items.push({
         key: 'delete-post',
         label: (
           <DeletePostModal
-            postId={post.data.id}
+            postId={post.id}
             trigger={<div>Delete Post</div>}
             onSuccess={() => {
               navigate('/', { replace: true })
@@ -102,22 +107,20 @@ export default function PostDetails() {
     return items
   }, [post, user, navigate])
 
-  if (post.isLoading) {
+  if (isLoading) {
     return <Loading title="Loading post details..." />
   }
 
-  if (post.error) {
-    return <Result subTitle={getErrorMessage(post.error)} />
+  if (error) {
+    return <Result subTitle={getErrorMessage(error)} />
   }
 
   return (
     <Page className="space-y-4 py-4">
       <div className="flex items-center justify-between rounded-lg bg-white p-4 shadow-sm">
         <div>
-          <Link to={`/profile/${post.data?.createdBy.username}`}>@{post.data?.createdBy?.username}</Link>
-          <div className="text-sm text-gray-500">
-            {post.data?.createdAt ? dayjs(post.data?.createdAt).fromNow() : null}
-          </div>
+          <Link to={`/profile/${post?.createdBy.username}`}>@{post?.createdBy?.username}</Link>
+          <div className="text-sm text-gray-500">{post?.createdAt ? dayjs(post?.createdAt).fromNow() : null}</div>
         </div>
         <div>
           <Dropdown
@@ -132,7 +135,10 @@ export default function PostDetails() {
       </div>
 
       {postImage.data ? (
-        <img src={URL.createObjectURL(postImage.data)} alt="code" className="h-full w-full rounded object-contain" />
+        <div className="space-y-2 rounded-lg bg-white px-2 py-4 shadow-sm">
+          <div>{post?.title}</div>
+          <img src={URL.createObjectURL(postImage.data)} alt="code" className="h-full w-full rounded object-contain" />
+        </div>
       ) : null}
 
       <div className="rounded-lg bg-white shadow-sm">
@@ -151,13 +157,14 @@ export default function PostDetails() {
         </div>
 
         <div className="flex items-center space-x-4 px-4">
-          <div className="text-sm">{post.data?.likes?.length ?? 0} likes</div>
-          <div className="text-sm">{post.data?.comments?.length ?? 0} comments</div>
+          <div className="text-sm">{post?.likes?.length ?? 0} likes</div>
+          <div className="text-sm">{post?.comments?.length ?? 0} comments</div>
         </div>
 
         <Comments
+          className="p-4"
           postId={id}
-          comments={post.data?.comments ?? []}
+          comments={post?.comments ?? []}
           onCommentSuccess={(comment, queryClient) => {
             queryClient.setQueryData<Post>(['post', id], (prev) => {
               if (!prev) return {} as Post

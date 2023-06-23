@@ -1,114 +1,27 @@
 import { Result } from 'antd'
 import { range } from 'lodash'
-import { useEffect, useMemo } from 'react'
-import { useQuery, useQueryClient } from 'react-query'
+import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import Page from '~/components/page'
 import Post from '~/components/post'
 import useError from '~/hooks/use-error'
-import { useGlobalSocket } from '~/hooks/use-global-socket'
-import { fetchPosts } from '~/queries/post'
-import { Comment, Like, Post as PostType } from '~/types/post'
+import { usePosts } from '~/hooks/use-posts'
 
 export default function Home() {
+  const { posts, isLoading, error } = usePosts()
   const { getErrorMessage } = useError()
-  const posts = useQuery(['posts'], fetchPosts)
-  const { socket } = useGlobalSocket()
-  const queryClient = useQueryClient()
-
-  useEffect(
-    function listenToLikesOrDislikes() {
-      /** Listening to new likes */
-      const likeEvent = socket.on('like', (newLike: Like) => {
-        queryClient.setQueryData<PostType[]>(['posts'], (oldPosts) => {
-          if (!oldPosts) {
-            return []
-          }
-
-          return oldPosts.map((post) => {
-            if (post.id === newLike.postId) {
-              return { ...post, likes: [...post.likes, newLike] }
-            }
-            return post
-          })
-        })
-      })
-
-      /** Listening to dislikes */
-      const dislikeEvent = socket.on('dislike', (dislike: Like) => {
-        queryClient.setQueryData<PostType[]>(['posts'], (oldPosts) => {
-          if (!oldPosts) {
-            return []
-          }
-
-          return oldPosts.map((post) => {
-            if (post.id === dislike.postId) {
-              return { ...post, likes: post.likes.filter((like) => like.id !== dislike.id) }
-            }
-            return post
-          })
-        })
-      })
-
-      /** Listening to new comments */
-      const commentEvent = socket.on('comment', (newComment: Comment) => {
-        queryClient.setQueryData<PostType[]>(['posts'], (oldPosts) => {
-          if (!oldPosts) {
-            return []
-          }
-
-          return oldPosts.map((post) => {
-            if (post.id === newComment.postId) {
-              return { ...post, comments: [...post.comments, newComment] }
-            }
-            return post
-          })
-        })
-      })
-
-      /** Listening to remove comments */
-      const removeCommentEvent = socket.on('remove-comment', (deletedComment: Comment) => {
-        queryClient.setQueryData<PostType[]>(['posts'], (oldPosts) => {
-          if (!oldPosts) {
-            return []
-          }
-
-          return oldPosts.map((post) => {
-            if (post.id === deletedComment.postId) {
-              return { ...post, comments: post.comments.filter((comment) => comment.id !== deletedComment.id) }
-            }
-            return post
-          })
-        })
-      })
-
-      return () => {
-        likeEvent.off()
-        dislikeEvent.off()
-        commentEvent.off()
-        removeCommentEvent.off()
-      }
-    },
-    [queryClient, socket],
-  )
 
   const content = useMemo(() => {
-    if (posts.isLoading) {
+    if (isLoading) {
       return range(5).map((_, idx) => <div key={idx} className="h-96 w-full animate-pulse rounded-2xl bg-gray-300" />)
     }
 
-    if (posts.error) {
-      return (
-        <Result
-          status="500"
-          title="Something went wrong while fetching posts"
-          subTitle={getErrorMessage(posts.error)}
-        />
-      )
+    if (error) {
+      return <Result status="500" title="Something went wrong while fetching posts" subTitle={getErrorMessage(error)} />
     }
 
-    return posts?.data?.map((post) => <Post key={post.id} post={post} />)
-  }, [posts, getErrorMessage])
+    return posts?.map((post) => <Post key={post.id} post={post} />)
+  }, [isLoading, error, getErrorMessage, posts])
 
   return (
     <Page isFullScreen isHeroSection className="grid grid-cols-12">

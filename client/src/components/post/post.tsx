@@ -82,16 +82,17 @@ export default function Post({ className, style, post }: PostProps) {
 
   return (
     <div
-      className={clsx('overflow-hidden rounded-2xl border-2 bg-white', className)}
+      className={clsx('space-y-4 overflow-hidden rounded-2xl border-2 bg-white p-4', className)}
       id={`post-${post.id}`}
       style={style}
     >
-      <div className="space-y-2 p-4">
+      <div className="space-y-2">
         <Link to={`/profile/${post.createdBy.username}`} className="text-gray-500">
           @{post.createdBy.username}
         </Link>
         <div>{post.title}</div>
       </div>
+
       <div className="w-full">
         {postImage.isLoading ? (
           <div className="h-full w-full animate-pulse bg-gray-200" />
@@ -102,7 +103,7 @@ export default function Post({ className, style, post }: PostProps) {
         )}
       </div>
 
-      <div className="flex items-center space-x-4 p-4">
+      <div className="flex items-center space-x-4">
         <div className="cursor-pointer" onClick={handleLikeOrUnlike}>
           {isPostLiked ? (
             <AiFillHeart className="h-6 w-6 text-red-500 hover:text-red-300" />
@@ -125,7 +126,7 @@ export default function Post({ className, style, post }: PostProps) {
         </div>
       </div>
 
-      <div className="flex items-center space-x-4 px-4 pb-4">
+      <div className="flex items-center space-x-4">
         <div className="text-sm">{post.likes?.length ?? 0} likes</div>
         <div className="text-sm">{post.comments?.length ?? 0} comments</div>
       </div>
