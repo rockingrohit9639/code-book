@@ -1,18 +1,18 @@
 import { useEffect, useMemo } from 'react'
 import { useQuery, useQueryClient } from 'react-query'
 import { getUserNotifications } from '~/queries/notification'
-import { useGlobalSocket } from './use-global-socket'
 import { Notification } from '~/types/notification'
+import { useSocketContext } from './use-socket'
 
 export function useNotifications() {
   const notifications = useQuery(['notifications'], getUserNotifications)
-  const { socket } = useGlobalSocket()
+  const { socket } = useSocketContext()
   const queryClient = useQueryClient()
 
   useEffect(
     function listenToNotifications() {
       /** Listening to new notifications */
-      socket?.on('notification', (payload: Notification) => {
+      socket.on('notification', (payload: Notification) => {
         queryClient.setQueryData<Notification[]>(['notifications'], (oldData) => {
           if (oldData) {
             return [payload, ...oldData]
@@ -22,7 +22,7 @@ export function useNotifications() {
       })
 
       return () => {
-        socket?.off('notification')
+        socket.off('notification')
       }
     },
     [socket, queryClient],

@@ -32,7 +32,9 @@ export class LikeService {
 
     /** Emitting the event to all the followers to update likes */
     const to = post.createdBy.followerIds.filter((id) => id !== user.id).map((id) => `/global/${id}`)
-    this.socketGateway.wss.volatile.to(to).emit('like', likeCreated)
+    if (to.length) {
+      this.socketGateway.wss.volatile.to(to).emit('like', likeCreated)
+    }
 
     return likeCreated
   }
@@ -57,7 +59,9 @@ export class LikeService {
 
     /** Emitting the event to all the followers to update likes */
     const to = post.createdBy.followerIds.filter((id) => id !== user.id).map((id) => `/global/${id}`)
-    this.socketGateway.wss.volatile.to(to).emit('dislike', dislike)
+    if (to.length) {
+      this.socketGateway.wss.volatile.to(to).emit('dislike', dislike)
+    }
 
     return dislike
   }
