@@ -10,6 +10,7 @@ import { LikeModule } from './like/like.module'
 import { CommentModule } from './comment/comment.module'
 import { NotificationModule } from './notification/notification.module'
 import { SocketModule } from './socket/socket.module'
+import { ConversationModule } from './conversation/conversation.module'
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { SocketModule } from './socket/socket.module'
     CommentModule,
     NotificationModule,
     SocketModule,
+    ConversationModule,
   ],
   controllers: [],
   providers: [PrismaService],

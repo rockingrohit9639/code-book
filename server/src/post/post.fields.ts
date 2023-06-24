@@ -1,12 +1,9 @@
 import { Prisma } from '@prisma/client'
-import { omit } from 'lodash'
-import { USER_SELECT_FIELDS } from '~/user/user.fields'
+import { BASIC_USER_SELECT_FIELDS } from '~/user/user.fields'
 
 export const POST_INCLUDE_FIELDS = {
-  createdBy: {
-    select: omit(USER_SELECT_FIELDS, 'posts'),
-  },
-  image: { include: { createdBy: { select: omit(USER_SELECT_FIELDS, 'posts') } } },
-  likes: { include: { likedBy: { select: omit(USER_SELECT_FIELDS, 'posts') } } },
-  comments: { include: { commentBy: { select: omit(USER_SELECT_FIELDS, 'posts') } } },
+  createdBy: { select: BASIC_USER_SELECT_FIELDS },
+  image: { include: { createdBy: { select: BASIC_USER_SELECT_FIELDS } } },
+  likes: { include: { likedBy: { select: BASIC_USER_SELECT_FIELDS } } },
+  comments: { include: { commentBy: { select: BASIC_USER_SELECT_FIELDS } } },
 } satisfies Prisma.PostInclude
