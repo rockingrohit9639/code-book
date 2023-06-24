@@ -7,10 +7,11 @@ import Login from './pages/login/'
 import Signup from './pages/signup'
 import { useAuthContext } from './hooks/use-auth'
 
-const CreateNewPost = lazy(() => import('./pages/create-new-post'))
-const Home = lazy(() => import('./pages/home'))
-const Profile = lazy(() => import('./pages/profile'))
-const PostDetails = lazy(() => import('./pages/post-details'))
+const CreateNewPost = lazy(() => import('~/pages/create-new-post'))
+const Home = lazy(() => import('~/pages/home'))
+const Profile = lazy(() => import('~/pages/profile'))
+const PostDetails = lazy(() => import('~/pages/post-details'))
+const Messages = lazy(() => import('~/pages/messages'))
 
 function App() {
   const { authVerificationInProgress } = useAuthContext()
@@ -46,6 +47,7 @@ function App() {
         <Route path="/create-new-post" element={<CreateNewPost />} />
         <Route path="/profile/:username" element={<Profile />} />
         <Route path="/post/:id" element={<PostDetails />} />
+        <Route path="/messages" element={<Messages />} />
       </Route>
 
       <Route path="/login" element={<Login />} />

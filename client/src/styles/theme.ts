@@ -19,6 +19,8 @@ export const ANTD_THEME: ThemeConfig = {
     colorError: colors.red['500'],
     colorWarning: colors.yellow['600'],
     colorSuccess: colors.green['600'],
+
+    colorBgContainer: '#f3f5f8',
   },
   components: {
     Form: {

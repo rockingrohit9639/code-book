@@ -1,94 +1,64 @@
-import clsx from 'clsx'
 import { Link, useNavigate } from 'react-router-dom'
-import {
-  AiOutlineHome,
-  AiOutlineMessage,
-  AiOutlineNotification,
-  AiOutlineLogout,
-  AiOutlineUser,
-  AiOutlineSearch,
-} from 'react-icons/ai'
-import { Avatar, Dropdown } from 'antd'
+import { AiOutlineLogout, AiOutlineUser } from 'react-icons/ai'
+import { Avatar, Dropdown, Menu, SiderProps } from 'antd'
+import Sider from 'antd/es/layout/Sider'
+import React from 'react'
 import { useAuthContext } from '../../hooks/use-auth'
-import NotificationsDrawer from '../notifications-drawer'
-import SearchUsersDrawer from '../search-users-drawer'
+import AppShell from '../app-shell/app-shell'
+import { ROUTES } from '~/utils/routes'
 
-type SidebarProps = {
-  className?: string
-  style?: React.CSSProperties
-}
+type SidebarProps = SiderProps
 
-const LINK_CLASSNAME =
-  'hover:text-primary transition-all delay-75 ease-in-out border border-transparent py-3 hover:bg-gray-200 w-52 rounded-tr-3xl rounded-br-3xl pl-2'
-
-export default function Sidebar({ className, style }: SidebarProps) {
+export default function Sidebar(props: SidebarProps) {
   const { user, logout } = useAuthContext()
   const navigate = useNavigate()
 
   return (
-    <div className={clsx(className, 'flex flex-col justify-between px-4 py-8')} style={style}>
-      <div>
-        <Link to="/" className="mb-8 ml-2 block text-2xl font-bold">
-          <span className="text-primary">C</span>odebook
-        </Link>
-
-        <ul className="flex flex-col space-y-2">
-          <li className={LINK_CLASSNAME}>
-            <Link to="/" className="flex items-center space-x-2">
-              <AiOutlineHome className="h-6 w-6" />
-              <div>Home</div>
-            </Link>
-          </li>
-          <li className={LINK_CLASSNAME}>
-            <Link to="/messages" className="flex items-center space-x-2">
-              <AiOutlineMessage className="h-6 w-6" />
-              <div>Messages</div>
-            </Link>
-          </li>
-          <NotificationsDrawer
-            badgeClassName="w-40"
-            trigger={
-              <li className={clsx('flex cursor-pointer items-center space-x-2', LINK_CLASSNAME)}>
-                <AiOutlineNotification className="h-6 w-6" />
-                <div>Notifications</div>
-              </li>
-            }
+    <Sider
+      width={AppShell.SIDEBAR_WIDTH}
+      breakpoint="lg"
+      className="fixed left-0 top-0 bottom-0 h-screen overflow-hidden p-4"
+      {...props}
+    >
+      <div className="flex h-full flex-col justify-between">
+        <div>
+          <div className="text-background mb-4 text-2xl font-bold">Codebook</div>
+          <Menu
+            className="h-full"
+            theme="dark"
+            mode="inline"
+            items={ROUTES.map((route) => ({
+              key: route.id,
+              label: route.type === 'REACT_NODE' ? route.name : <Link to={route.path}>{route.name}</Link>,
+              icon: React.cloneElement(route.icon, { className: 'h-6 w-6' }),
+            }))}
           />
-          <SearchUsersDrawer
-            trigger={
-              <li className={clsx('flex cursor-pointer items-center space-x-2', LINK_CLASSNAME)}>
-                <AiOutlineSearch className="h-6 w-6" />
-                <div>Search</div>
-              </li>
-            }
-          />
-        </ul>
-      </div>
-
-      <Dropdown
-        trigger={['click']}
-        menu={{
-          items: [
-            {
-              key: 'profile',
-              icon: <AiOutlineUser />,
-              label: 'Profile',
-              onClick: () => navigate(`/profile/${user?.username}`),
-            },
-            {
-              key: 'logout',
-              icon: <AiOutlineLogout />,
-              label: 'Logout',
-              onClick: logout,
-            },
-          ],
-        }}
-      >
-        <div className="flex cursor-pointer items-center space-x-2 rounded-full bg-gray-200 px-4 py-2">
-          <Avatar className="bg-primary/80 text-background cursor-pointer">{user?.username[0].toUpperCase()}</Avatar>
-          <div>@{user?.username}</div>
         </div>
-      </Dropdown>
-    </div>
+        <Dropdown
+          trigger={['click']}
+          menu={{
+            items: [
+              {
+                key: 'profile',
+                icon: <AiOutlineUser />,
+                label: 'Profile',
+                onClick: () => navigate(`/profile/${user?.username}`),
+              },
+              {
+                key: 'logout',
+                icon: <AiOutlineLogout />,
+                label: 'Logout',
+                onClick: logout,
+              },
+            ],
+          }}
+        >
+          <div className="flex cursor-pointer items-center space-x-2 rounded-full bg-gray-200 px-4 py-2">
+            <Avatar className="bg-primary/80 text-background cursor-pointer">{user?.username[0].toUpperCase()}</Avatar>
+            <div>@{user?.username}</div>
+          </div>
+        </Dropdown>
+      </div>
+    </Sider>
   )
 }
