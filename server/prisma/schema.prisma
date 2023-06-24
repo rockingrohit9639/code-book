@@ -38,17 +38,22 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  files             File[]
-  posts             Post[]
-  followers         User[]         @relation("UserFollows", fields: [followerIds], references: [id])
-  followerIds       String[]       @db.ObjectId
-  following         User[]         @relation("UserFollows", fields: [followingIds], references: [id])
-  followingIds      String[]       @db.ObjectId
-  likedPosts        Like[]
-  comments          Comment[]
-  byNotifications   Notification[] @relation(name: "NotificationBy")
-  toNotifications   Notification[] @relation(name: "NotificationTo", references: [id], fields: [toNotificationIds])
-  toNotificationIds String[]       @db.ObjectId
+  files                File[]
+  posts                Post[]
+  followers            User[]         @relation("UserFollows", fields: [followerIds], references: [id])
+  followerIds          String[]       @db.ObjectId
+  following            User[]         @relation("UserFollows", fields: [followingIds], references: [id])
+  followingIds         String[]       @db.ObjectId
+  likedPosts           Like[]
+  comments             Comment[]
+  byNotifications      Notification[] @relation(name: "NotificationBy")
+  toNotifications      Notification[] @relation(name: "NotificationTo", references: [id], fields: [toNotificationIds])
+  toNotificationIds    String[]       @db.ObjectId
+  conversations        Conversation[] @relation(fields: [conversationIds], references: [id])
+  conversationIds      String[]       @db.ObjectId
+  conversationsCreated Conversation[] @relation(name: "ConversationsCreated")
+  sentMessages         Message[]      @relation(name: "SentMessages")
+  receivedMessages     Message[]      @relation(name: "ReceivedMessages")
 }
 
 model File {
@@ -123,4 +128,33 @@ model Notification {
   post              Post?            @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId            String?          @db.ObjectId
   type              NotificationType
+}
+
+model Conversation {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isGroup   Boolean  @default(false)
+
+  users       User[]    @relation(fields: [userIds], references: [id])
+  userIds     String[]  @db.ObjectId
+  createdBy   User      @relation(fields: [createdById], references: [id], name: "ConversationsCreated", onDelete: Cascade)
+  createdById String    @db.ObjectId
+  messages    Message[]
+}
+
+model Message {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  content   String
+  seen      Boolean  @default(false)
+  delivered Boolean
+
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  conversationId String       @db.ObjectId
+  from           User         @relation(fields: [fromId], references: [id], onDelete: Cascade, name: "SentMessages")
+  fromId         String       @db.ObjectId
+  recipient      User?        @relation(fields: [recipientId], references: [id], onDelete: Cascade, name: "ReceivedMessages")
+  recipientId    String?      @db.ObjectId
 }
