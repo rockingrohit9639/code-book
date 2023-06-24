@@ -12,7 +12,7 @@ export function usePosts() {
   useEffect(
     function listenToLikesOrDislikes() {
       /** Listening to new likes */
-      const likeEvent = socket.on('like', (newLike: Like) => {
+      const likeEvent = socket?.on('like', (newLike: Like) => {
         queryClient.setQueryData<Post[]>(['posts'], (oldPosts) => {
           if (!oldPosts) {
             return []
@@ -28,7 +28,7 @@ export function usePosts() {
       })
 
       /** Listening to dislikes */
-      const dislikeEvent = socket.on('dislike', (dislike: Like) => {
+      const dislikeEvent = socket?.on('dislike', (dislike: Like) => {
         queryClient.setQueryData<Post[]>(['posts'], (oldPosts) => {
           if (!oldPosts) {
             return []
@@ -44,7 +44,7 @@ export function usePosts() {
       })
 
       /** Listening to new comments */
-      const commentEvent = socket.on('comment', (newComment: Comment) => {
+      const commentEvent = socket?.on('comment', (newComment: Comment) => {
         queryClient.setQueryData<Post[]>(['posts'], (oldPosts) => {
           if (!oldPosts) {
             return []
@@ -60,7 +60,7 @@ export function usePosts() {
       })
 
       /** Listening to remove comments */
-      const removeCommentEvent = socket.on('remove-comment', (deletedComment: Comment) => {
+      const removeCommentEvent = socket?.on('remove-comment', (deletedComment: Comment) => {
         queryClient.setQueryData<Post[]>(['posts'], (oldPosts) => {
           if (!oldPosts) {
             return []
@@ -76,10 +76,10 @@ export function usePosts() {
       })
 
       return () => {
-        likeEvent.off()
-        dislikeEvent.off()
-        commentEvent.off()
-        removeCommentEvent.off()
+        likeEvent?.off()
+        dislikeEvent?.off()
+        commentEvent?.off()
+        removeCommentEvent?.off()
       }
     },
     [queryClient, socket],

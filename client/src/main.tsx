@@ -10,6 +10,7 @@ import './styles/tailwind.css'
 import { ANTD_THEME } from './styles/theme'
 import { queryClient } from './utils/client'
 import { AuthProvider } from './hooks/use-auth'
+import { AppShellProvider } from './hooks/use-app-shell'
 
 dayjs.extend(relativeTime)
 
@@ -19,7 +20,9 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <ConfigProvider theme={ANTD_THEME}>
-            <App />
+            <AppShellProvider>
+              <App />
+            </AppShellProvider>
           </ConfigProvider>
         </AuthProvider>
       </QueryClientProvider>

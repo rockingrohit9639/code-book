@@ -41,7 +41,7 @@ export default function PostDetails() {
       queryClient.setQueryData<Post>(['post', id], (prev) => {
         if (!prev) return {} as Post
 
-        return { ...prev, likes: [...prev.likes, like] }
+        return { ...prev, likes: [...(prev.likes ?? []), like] }
       })
       setIsPostLiked(true)
     },
@@ -53,7 +53,7 @@ export default function PostDetails() {
       queryClient.setQueryData<Post>(['post', id], (prev) => {
         if (!prev) return {} as Post
 
-        return { ...prev, likes: prev.likes.filter((l) => l.id !== like.id) }
+        return { ...prev, likes: prev.likes?.filter((l) => l.id !== like.id) }
       })
       setIsPostLiked(false)
     },

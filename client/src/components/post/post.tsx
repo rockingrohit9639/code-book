@@ -133,7 +133,7 @@ export default function Post({ className, style, post }: PostProps) {
 
       {commentVisible ? (
         <Comments
-          className="border-t-2"
+          className="border-t-2 pt-2"
           postId={post.id}
           comments={post.comments}
           onCommentSuccess={(comment, queryClient) => {

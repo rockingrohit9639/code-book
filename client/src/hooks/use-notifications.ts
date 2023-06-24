@@ -12,7 +12,7 @@ export function useNotifications() {
   useEffect(
     function listenToNotifications() {
       /** Listening to new notifications */
-      socket.on('notification', (payload: Notification) => {
+      socket?.on('notification', (payload: Notification) => {
         queryClient.setQueryData<Notification[]>(['notifications'], (oldData) => {
           if (oldData) {
             return [payload, ...oldData]
@@ -22,7 +22,7 @@ export function useNotifications() {
       })
 
       return () => {
-        socket.off('notification')
+        socket?.off('notification')
       }
     },
     [socket, queryClient],

@@ -6,10 +6,12 @@ import React from 'react'
 import { useAuthContext } from '../../hooks/use-auth'
 import AppShell from '../app-shell/app-shell'
 import { ROUTES } from '~/utils/routes'
+import { useAppShellContext } from '~/hooks/use-app-shell'
 
 type SidebarProps = SiderProps
 
 export default function Sidebar(props: SidebarProps) {
+  const { isSiderCollapsed } = useAppShellContext()
   const { user, logout } = useAuthContext()
   const navigate = useNavigate()
 
@@ -18,11 +20,12 @@ export default function Sidebar(props: SidebarProps) {
       width={AppShell.SIDEBAR_WIDTH}
       breakpoint="lg"
       className="fixed left-0 top-0 bottom-0 h-screen overflow-hidden p-4"
+      collapsed={isSiderCollapsed}
       {...props}
     >
-      <div className="flex h-full flex-col justify-between">
+      <div className="flex h-full flex-col items-center justify-between">
         <div>
-          <div className="text-background mb-4 text-2xl font-bold">Codebook</div>
+          <div className="text-background mb-4 text-2xl font-bold">{!isSiderCollapsed ? 'Codebook' : null}</div>
           <Menu
             className="h-full"
             theme="dark"
@@ -53,10 +56,16 @@ export default function Sidebar(props: SidebarProps) {
             ],
           }}
         >
-          <div className="flex cursor-pointer items-center space-x-2 rounded-full bg-gray-200 px-4 py-2">
+          {isSiderCollapsed ? (
             <Avatar className="bg-primary/80 text-background cursor-pointer">{user?.username[0].toUpperCase()}</Avatar>
-            <div>@{user?.username}</div>
-          </div>
+          ) : (
+            <div className="flex cursor-pointer items-center space-x-2 rounded-full bg-gray-200 px-4 py-2">
+              <Avatar className="bg-primary/80 text-background cursor-pointer">
+                {user?.username[0].toUpperCase()}
+              </Avatar>
+              <div>@{user?.username}</div>
+            </div>
+          )}
         </Dropdown>
       </div>
     </Sider>
