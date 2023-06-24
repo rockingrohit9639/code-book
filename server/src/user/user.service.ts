@@ -27,7 +27,12 @@ export class UserService {
     return this.prismaService.user.findMany({
       where: {
         role: { not: 'ADMIN' },
-        username: { contains: dto.query },
+        OR: [
+          { username: { contains: dto.query } },
+          { firstName: { contains: dto.query } },
+          { lastName: { contains: dto.query } },
+          { email: { contains: dto.query } },
+        ],
         NOT: { id: user.id },
       },
     })
