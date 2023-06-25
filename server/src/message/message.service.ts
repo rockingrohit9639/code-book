@@ -1,13 +1,17 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, UnauthorizedException } from '@nestjs/common'
 import { Message } from '@prisma/client'
 import { PrismaService } from '~/prisma/prisma.service'
 import { UserWithoutSensitiveData } from '~/user/user.type'
 import { CreateMessageDto } from './message.dto'
 import { MESSAGE_INCLUDE_FIELDS } from './message.fields'
+import { ConversationService } from '~/conversation/conversation.service'
 
 @Injectable()
 export class MessageService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly conversationService: ConversationService,
+  ) {}
 
   createMessage(dto: CreateMessageDto, user: UserWithoutSensitiveData): Promise<Message> {
     return this.prismaService.message.create({
@@ -20,5 +24,15 @@ export class MessageService {
       },
       include: MESSAGE_INCLUDE_FIELDS,
     })
+  }
+
+  async getConversationMessage(conversationId: string, user: UserWithoutSensitiveData): Promise<Message[]> {
+    const isConversationValid = await this.conversationService.checkIsConversationValidForUser(conversationId, user)
+
+    if (!isConversationValid) {
+      throw new UnauthorizedException('You are not allowed to view messages of this conversation!')
+    }
+
+    return this.prismaService.message.findMany({ where: { conversationId }, include: MESSAGE_INCLUDE_FIELDS })
   }
 }

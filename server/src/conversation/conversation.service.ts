@@ -68,4 +68,15 @@ export class ConversationService {
     }
     return this.prismaService.conversation.delete({ where: { id } })
   }
+
+  async checkIsConversationValidForUser(id: string, user: UserWithoutSensitiveData): Promise<boolean> {
+    const conversation = await this.findOneById(id)
+
+    /** Conversation is only valid to a user if he/she has created it or he/she is in the users array of conversation */
+    if (conversation.createdById === user.id || conversation.userIds.includes(user.id)) {
+      return true
+    }
+
+    return false
+  }
 }

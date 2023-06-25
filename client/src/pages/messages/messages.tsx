@@ -1,9 +1,11 @@
-import { SendOutlined } from '@ant-design/icons'
-import { Avatar, Button, Form, Input, Result } from 'antd'
+import { Avatar, Empty, Result } from 'antd'
+import clsx from 'clsx'
 import { range } from 'lodash'
 import { useEffect, useMemo } from 'react'
 import { AiOutlineEdit } from 'react-icons/ai'
 import { useQuery } from 'react-query'
+import { Link, useParams } from 'react-router-dom'
+import Chat from '~/components/chat'
 import Page from '~/components/page'
 import { useAppShellContext } from '~/hooks/use-app-shell'
 import { useUser } from '~/hooks/use-user'
@@ -11,6 +13,7 @@ import { getUserConversations } from '~/queries/conversation'
 import { getErrorMessage } from '~/utils/error'
 
 export default function Messages() {
+  const { conversationId } = useParams<{ conversationId: string }>()
   const { setIsSiderCollapsed } = useAppShellContext()
   const { user } = useUser()
 
@@ -26,10 +29,7 @@ export default function Messages() {
   const conversationsContent = useMemo(() => {
     if (conversations.isLoading) {
       return range(6).map((_, index) => (
-        <div
-          key={index}
-          className="flex cursor-pointer items-center gap-2 rounded-lg border px-4 py-2 hover:bg-gray-200"
-        >
+        <div key={index} className="decoration flex cursor-pointer items-center gap-2 rounded-lg border px-4 py-2">
           <div className="h-10 w-10 animate-pulse rounded-full bg-gray-300" />
           <div className="space-y-1">
             <div className="h-3 w-20 animate-pulse rounded-sm bg-gray-300" />
@@ -50,22 +50,26 @@ export default function Messages() {
           : conversation.users[0]
 
         return (
-          <div
+          <Link
+            to={`/messages/${conversation.id}`}
             key={conversation.id}
-            className="flex cursor-pointer items-center gap-2 rounded-lg border px-4 py-2 hover:bg-gray-200"
+            className={clsx(
+              'flex cursor-pointer items-center gap-2 rounded-lg border-2 border-transparent px-4 py-2 transition-all delay-75 hover:border-gray-200',
+              conversationId === conversation.id && 'border-gray-200',
+            )}
           >
             <Avatar className="uppercase">{userToShow.username[0]}</Avatar>
             <div>
-              <div className="">@{userToShow.username}</div>
+              <div className="text-black hover:text-black">@{userToShow.username}</div>
               <div className="text-sm text-gray-500">Last Message</div>
             </div>
-          </div>
+          </Link>
         )
       })
     }
 
     return null
-  }, [conversations, user.id])
+  }, [conversations, user.id, conversationId])
 
   return (
     <Page className="grid grid-cols-12">
@@ -76,20 +80,13 @@ export default function Messages() {
         <div>Messages</div>
         <div className="space-y-2">{conversationsContent}</div>
       </div>
-      <div className="col-span-9 flex flex-col">
-        {/* <Empty description="Please select a chat to start conversation" /> */}
-        <div className="flex-1" />
-        <div className="h-20 border-t-2">
-          <Form className="flex h-full w-full items-center justify-center p-4">
-            <div className="flex w-full gap-4">
-              <Form.Item name="message" className="w-full" noStyle>
-                <Input placeholder="What is on your mind?" />
-              </Form.Item>
-              <Button icon={<SendOutlined />}>Send</Button>
-            </div>
-          </Form>
+      {conversationId ? (
+        <Chat className="col-span-9" conversationId={conversationId} />
+      ) : (
+        <div className="col-span-9 flex h-full w-full items-center justify-center">
+          <Empty description="Please select a chat to start conversation" />
         </div>
-      </div>
+      )}
     </Page>
   )
 }

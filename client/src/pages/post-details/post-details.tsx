@@ -108,7 +108,7 @@ export default function PostDetails() {
   }, [post, user, navigate])
 
   if (isLoading) {
-    return <Loading title="Loading post details..." />
+    return <Loading className="h-screen" title="Loading post details..." />
   }
 
   if (error) {

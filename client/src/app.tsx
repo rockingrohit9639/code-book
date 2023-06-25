@@ -48,7 +48,7 @@ function App() {
         <Route path="/profile/:username" element={<Profile />} />
         <Route path="/post/:id" element={<PostDetails />} />
         <Route path="/messages" element={<Messages />} />
-        <Route path="/messages/:id" element={<Messages />} />
+        <Route path="/messages/:conversationId" element={<Messages />} />
       </Route>
 
       <Route path="/login" element={<Login />} />

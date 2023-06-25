@@ -18,7 +18,7 @@ export default function NotificationsDrawer({ className, style, trigger, badgeCl
 
   const content = useMemo(() => {
     if (isNotificationsLoading) {
-      return <Loading title="Loading notifications..." />
+      return <Loading className="h-screen" title="Loading notifications..." />
     }
 
     if (notificationError) {

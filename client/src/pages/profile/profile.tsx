@@ -151,7 +151,7 @@ export default function Profile() {
   }, [followMutation, unfollowMutation, profile.data?.id, showFollowButton])
 
   if (profile.isLoading) {
-    return <Loading title="Loading user profile...." />
+    return <Loading className="h-screen" title="Loading user profile...." />
   }
 
   if (profile.error) {

@@ -7,5 +7,6 @@ import { PrismaService } from '~/prisma/prisma.service'
   imports: [],
   controllers: [ConversationController],
   providers: [ConversationService, PrismaService],
+  exports: [ConversationService],
 })
 export class ConversationModule {}
