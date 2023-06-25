@@ -1,10 +1,12 @@
 import constate from 'constate'
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { io } from 'socket.io-client'
 import { ENV } from '~/utils/env'
 import { useAuthContext } from './use-auth'
+import { User } from '~/types/user'
 
 export function useSocket() {
+  const [activeUsers, setActiveUsers] = useState<User[] | undefined>()
   const { user } = useAuthContext()
   const accessToken = localStorage.getItem(ENV.VITE_BEARER_TOKEN_KEY)
 
@@ -24,6 +26,15 @@ export function useSocket() {
     }
   }, [socket, user?.id])
 
+  const handleNewUser = useCallback(
+    (newUser: User) => {
+      if (!activeUsers?.find((user) => user.id === newUser.id)) {
+        setActiveUsers((prevUsers) => [...(prevUsers ?? []), newUser])
+      }
+    },
+    [activeUsers],
+  )
+
   useEffect(
     function joinRoomOnMount() {
       if (user?.id) {
@@ -38,12 +49,14 @@ export function useSocket() {
   )
 
   useEffect(() => {
-    socket.on('new-user', (user: any) => {
-      console.log('New User Detected', user)
-    })
-  }, [socket])
+    socket.on('new-user', handleNewUser)
 
-  return { socket }
+    return () => {
+      socket.off('new-user', handleNewUser)
+    }
+  }, [socket, handleNewUser])
+
+  return { socket, activeUsers }
 }
 
 export const [SocketProvider, useSocketContext] = constate(useSocket)
