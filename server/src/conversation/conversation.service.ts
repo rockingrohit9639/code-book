@@ -9,7 +9,33 @@ import { CONVERSATION_INCLUDE_FIELDS } from './conversation.fields'
 export class ConversationService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  createConversation(dto: CreateConversationDto, user: UserWithoutSensitiveData): Promise<Conversation> {
+  async getExistingConversation(userId: string, users: string[]): Promise<Conversation | null> {
+    /** Conversation exists if current user created it and other users are in users array of conversation
+     * Or, one of the users created the conversation and current user is in the users array of conversation
+     */
+    const conversation = await this.prismaService.conversation.findFirst({
+      where: {
+        OR: [
+          { AND: [{ createdById: userId }, { userIds: { hasSome: users } }] },
+          { AND: [{ createdById: { in: users } }, { userIds: { hasSome: userId } }] },
+        ],
+      },
+    })
+
+    if (!conversation) {
+      return null
+    }
+
+    return conversation
+  }
+
+  async createConversation(dto: CreateConversationDto, user: UserWithoutSensitiveData): Promise<Conversation> {
+    /** If there is an already created conversation, we will not create another conversation  */
+    const conversation = await this.getExistingConversation(user.id, dto.users)
+    if (conversation) {
+      return conversation
+    }
+
     return this.prismaService.conversation.create({
       data: {
         createdBy: { connect: { id: user.id } },
