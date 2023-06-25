@@ -56,7 +56,7 @@ export default function Chat({ className, style, conversationId }: ChatProps) {
 
       form.resetFields()
     },
-    [conversationId, user, form, addNewMessage],
+    [conversationId, user, form, addNewMessage, socket],
   )
 
   useEffect(
