@@ -8,7 +8,7 @@ export type Conversation = {
   users: User[]
   userIds: string[]
   createdBy: User
-  createdById: User
+  createdById: string
 }
 
 export type CreateConversationDto = {

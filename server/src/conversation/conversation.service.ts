@@ -48,7 +48,7 @@ export class ConversationService {
 
   getUserConversations(user: UserWithoutSensitiveData): Promise<Conversation[]> {
     return this.prismaService.conversation.findMany({
-      where: { users: { some: { id: user.id } } },
+      where: { OR: [{ createdById: user.id }, { userIds: { has: user.id } }] },
       include: CONVERSATION_INCLUDE_FIELDS,
     })
   }
