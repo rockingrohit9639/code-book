@@ -5,6 +5,7 @@ import { UserWithoutSensitiveData } from '~/user/user.type'
 import { CreateMessageDto } from './message.dto'
 import { MESSAGE_INCLUDE_FIELDS } from './message.fields'
 import { ConversationService } from '~/conversation/conversation.service'
+import { MessageWithUserData } from './message.types'
 
 @Injectable()
 export class MessageService {
@@ -13,12 +14,12 @@ export class MessageService {
     private readonly conversationService: ConversationService,
   ) {}
 
-  createMessage(dto: CreateMessageDto, user: UserWithoutSensitiveData): Promise<Message> {
+  createMessage(dto: CreateMessageDto): Promise<MessageWithUserData> {
     return this.prismaService.message.create({
       data: {
         content: dto.content,
         conversationId: dto.conversation,
-        fromId: user.id,
+        fromId: dto.from,
         delivered: true,
         recipientId: dto.recipient,
       },

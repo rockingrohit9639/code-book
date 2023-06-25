@@ -15,6 +15,10 @@ export function useSocket() {
           socket.emit('joinRoom', `/global/${user.id}`)
         }
       })
+
+      return () => {
+        socket.off('joinRoom')
+      }
     },
     [user, socket],
   )

@@ -7,6 +7,9 @@ export class CreateMessageDto {
   @IsMongoId()
   conversation: string
 
+  @IsMongoId()
+  from: string
+
   @IsOptional()
   @IsMongoId()
   recipient: string
