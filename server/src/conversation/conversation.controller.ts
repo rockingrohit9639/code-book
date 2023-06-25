@@ -1,10 +1,12 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/common'
 import { Conversation } from '@prisma/client'
 import { ConversationService } from './conversation.service'
 import { GetUser } from '~/auth/user.decorator'
 import { UserWithoutSensitiveData } from '~/user/user.type'
 import { CreateConversationDto } from './conversation.dto'
+import { JwtGuard } from '~/auth/jwt/jwt.guard'
 
+@UseGuards(JwtGuard)
 @Controller('conversations')
 export class ConversationController {
   constructor(private readonly conversationService: ConversationService) {}

@@ -20,6 +20,7 @@ export const USER_SELECT_FIELDS = {
   followerIds: true,
   followingIds: true,
   toNotificationIds: true,
+  conversationIds: true,
 } satisfies Prisma.UserSelect
 
 export const BASIC_USER_SELECT_FIELDS: Prisma.UserSelect = {

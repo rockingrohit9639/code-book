@@ -2,7 +2,7 @@ import { Button, Result, Tabs } from 'antd'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
 import { Link, useParams } from 'react-router-dom'
 import { AiOutlineGlobal, AiOutlineGithub, AiOutlineLinkedin } from 'react-icons/ai'
-import { EditOutlined, UserAddOutlined, UserDeleteOutlined } from '@ant-design/icons'
+import { EditOutlined, MessageOutlined, UserAddOutlined, UserDeleteOutlined } from '@ant-design/icons'
 import { BiBookmark, BiGridAlt } from 'react-icons/bi'
 import { useCallback, useMemo } from 'react'
 import invariant from 'tiny-invariant'
@@ -15,6 +15,7 @@ import { useUser } from '~/hooks/use-user'
 import Post from '~/components/post'
 import useError from '~/hooks/use-error'
 import { UserWithoutSensitiveData } from '~/types/user'
+import CreateConversation from '~/components/create-conversation'
 
 export default function Profile() {
   const { username } = useParams() as { username: string }
@@ -205,6 +206,16 @@ export default function Profile() {
           </div>
 
           <div className="flex items-center space-x-2">
+            {profile.data?.followerIds.includes(user.id) ? (
+              <CreateConversation
+                trigger={
+                  <Button type="primary" icon={<MessageOutlined />}>
+                    Message
+                  </Button>
+                }
+                userIds={[profile.data.id]}
+              />
+            ) : null}
             {showFollowButton ? (
               <Button type="primary" icon={<UserAddOutlined />} onClick={handleFollowUnfollow}>
                 Follow
