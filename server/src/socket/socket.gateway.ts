@@ -1,8 +1,9 @@
 import { WebSocketGateway, OnGatewayInit, WebSocketServer, SubscribeMessage } from '@nestjs/websockets'
-import { Logger, UseGuards } from '@nestjs/common'
+import { Logger } from '@nestjs/common'
 import { Socket, Server } from 'socket.io'
-import { SocketJwtGuard } from '~/auth/socket/socket.guard'
 import { JwtPayload } from '~/auth/jwt/jwt.type'
+
+type SocketWithUser = Socket & { user: JwtPayload }
 
 @WebSocketGateway({ cors: { origin: '*' } })
 export class SocketGateway implements OnGatewayInit {
@@ -13,9 +14,15 @@ export class SocketGateway implements OnGatewayInit {
     this.logger.log('Initialized Socket Gateway!')
   }
 
-  @UseGuards(SocketJwtGuard)
+  handleDisconnect(client: SocketWithUser) {
+    if (client.user) {
+      client.leave(client.user.id)
+      client.broadcast.emit('user-left', client.user)
+    }
+  }
+
   @SubscribeMessage('joinRoom')
-  handleRoomJoin(client: Socket & { user: JwtPayload }, room: string) {
+  handleRoomJoin(client: SocketWithUser, room: string) {
     if (!client.rooms.has(room)) {
       client.join(room)
       client.broadcast.emit('new-user', client.user)

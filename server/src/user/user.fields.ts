@@ -23,9 +23,9 @@ export const USER_SELECT_FIELDS = {
   conversationIds: true,
 } satisfies Prisma.UserSelect
 
-export const BASIC_USER_SELECT_FIELDS: Prisma.UserSelect = {
+export const BASIC_USER_SELECT_FIELDS = {
   id: true,
   username: true,
   firstName: true,
   lastName: true,
-}
+} satisfies Prisma.UserSelect

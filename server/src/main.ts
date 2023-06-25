@@ -4,6 +4,7 @@ import { Logger, ValidationPipe } from '@nestjs/common'
 import { AppModule } from './app.module'
 import { EnvironmentVars } from './config/config.options'
 import { PrismaService } from './prisma/prisma.service'
+import { AuthenticatedSocketIoAdapter } from './socket/socket.adapter'
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
@@ -20,6 +21,9 @@ async function bootstrap() {
   /** Graceful application shutdown */
   const prismaService = app.get(PrismaService)
   await prismaService.enableShutdownHooks(app)
+
+  /** Using adapter to handle authentication */
+  app.useWebSocketAdapter(new AuthenticatedSocketIoAdapter(app))
 
   /** Configuring PORT */
   const configService = app.get(ConfigService<EnvironmentVars>)

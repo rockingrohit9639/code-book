@@ -9,9 +9,9 @@ import { Prisma, User } from '@prisma/client'
 import * as bcrypt from 'bcrypt'
 import { omit } from 'lodash'
 import { PrismaService } from '~/prisma/prisma.service'
-import { UserWithoutSensitiveData } from './user.type'
+import { BasicUser, UserWithoutSensitiveData } from './user.type'
 import { SignupDto } from '~/auth/auth.dto'
-import { USER_SELECT_FIELDS } from './user.fields'
+import { BASIC_USER_SELECT_FIELDS, USER_SELECT_FIELDS } from './user.fields'
 import { SearchUserDto, UpdateUserProfileDto } from './user.dto'
 import { POST_INCLUDE_FIELDS } from '~/post/post.fields'
 import { NotificationService } from '~/notification/notification.service'
@@ -54,6 +54,11 @@ export class UserService {
     return user
   }
 
+  async findBasicUserById(id: string): Promise<BasicUser | null> {
+    return this.prismaService.user.findFirst({ where: { id }, select: BASIC_USER_SELECT_FIELDS })
+  }
+
+  /** Only basic information si required in socket.io adapter */
   async findOneByUsername(username: string): Promise<UserWithoutSensitiveData> {
     const user = await this.prismaService.user.findFirst({
       where: { username },

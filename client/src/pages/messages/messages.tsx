@@ -28,7 +28,7 @@ export default function Messages() {
   const conversationsContent = useMemo(() => {
     if (conversations.isLoading) {
       return range(6).map((_, index) => (
-        <div key={index} className="decoration flex cursor-pointer items-center gap-2 rounded-lg border px-4 py-2">
+        <div key={index} className="flex cursor-pointer items-center gap-2 border px-4 py-2">
           <div className="h-10 w-10 animate-pulse rounded-full bg-gray-300" />
           <div className="space-y-1">
             <div className="h-3 w-20 animate-pulse rounded-sm bg-gray-300" />
