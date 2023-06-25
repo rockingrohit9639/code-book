@@ -18,13 +18,12 @@ export class MessageGateway implements OnGatewayInit {
   @SubscribeMessage('message')
   async handleNewMessage(client: Socket, payload: CreateMessageDto) {
     const newMessage = await this.messageService.createMessage(payload)
+    client.to(payload.conversation).emit('message', newMessage)
+  }
 
-    const to = [newMessage.conversation.createdById, ...newMessage.conversation.userIds].filter(
-      (id) => id !== payload.from,
-    )
-
-    if (to.length) {
-      client.to(to).emit('message', newMessage)
-    }
+  @SubscribeMessage('joinConversation')
+  handleJoinConversation(client: Socket, conversationId: string) {
+    client.join(conversationId)
+    this.logger.log(`Client ${client.id} joined conversation ${conversationId}`)
   }
 }

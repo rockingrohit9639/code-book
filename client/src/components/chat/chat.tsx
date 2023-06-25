@@ -74,6 +74,17 @@ export default function Chat({ className, style, conversationId }: ChatProps) {
     [user.id, addNewMessage, socket],
   )
 
+  useEffect(
+    function joinConversation() {
+      socket.emit('joinConversation', conversationId)
+
+      return () => {
+        socket.emit('leaveConversation', conversationId)
+      }
+    },
+    [conversationId, socket],
+  )
+
   if (messages.isLoading) {
     return <Loading className="col-span-9" title="Loading Messages..." />
   }
@@ -113,7 +124,7 @@ export default function Chat({ className, style, conversationId }: ChatProps) {
         <Form form={form} className="flex h-full w-full items-center justify-center p-4" onFinish={handleSendMessage}>
           <div className="flex w-full gap-4">
             <Form.Item name="content" className="w-full" rules={[{ required: true, message: 'Please enter message!' }]}>
-              <Input placeholder="What is on your mind?" />
+              <Input placeholder="What is on your mind?" autoFocus />
             </Form.Item>
             <Form.Item noStyle dependencies={['content']}>
               {({ getFieldValue }) => {
