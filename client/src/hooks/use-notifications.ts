@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 import { useQuery, useQueryClient } from 'react-query'
 import { getUserNotifications } from '~/queries/notification'
 import { Notification } from '~/types/notification'
@@ -9,23 +9,28 @@ export function useNotifications() {
   const { socket } = useSocketContext()
   const queryClient = useQueryClient()
 
+  const handleNewNotification = useCallback(
+    (payload: Notification) => {
+      queryClient.setQueryData<Notification[]>(['notifications'], (oldData) => {
+        if (oldData) {
+          return [payload, ...oldData]
+        }
+        return [payload]
+      })
+    },
+    [queryClient],
+  )
+
   useEffect(
     function listenToNotifications() {
       /** Listening to new notifications */
-      socket.on('notification', (payload: Notification) => {
-        queryClient.setQueryData<Notification[]>(['notifications'], (oldData) => {
-          if (oldData) {
-            return [payload, ...oldData]
-          }
-          return [payload]
-        })
-      })
+      socket.on('notification', handleNewNotification)
 
       return () => {
-        socket.off('notification')
+        socket.off('notification', handleNewNotification)
       }
     },
-    [socket, queryClient],
+    [socket, queryClient, handleNewNotification],
   )
 
   const unreadNotifications = useMemo(

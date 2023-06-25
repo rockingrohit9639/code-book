@@ -1,5 +1,5 @@
 import constate from 'constate'
-import { useEffect } from 'react'
+import { useCallback, useEffect } from 'react'
 import { io } from 'socket.io-client'
 import { ENV } from '~/utils/env'
 import { useAuthContext } from './use-auth'
@@ -8,19 +8,21 @@ export function useSocket() {
   const { user } = useAuthContext()
   const socket = io(ENV.VITE_API_BASE_URL)
 
+  const joinRoom = useCallback(() => {
+    if (user?.id) {
+      socket.emit('joinRoom', user.id)
+    }
+  }, [socket, user?.id])
+
   useEffect(
-    function joinRoom() {
-      socket.on('connect', () => {
-        if (user?.id) {
-          socket.emit('joinRoom', user.id)
-        }
-      })
+    function joinRoomOnMount() {
+      socket.on('connect', joinRoom)
 
       return () => {
-        socket.off('joinRoom')
+        socket.off('joinRoom', joinRoom)
       }
     },
-    [user, socket],
+    [user, socket, joinRoom],
   )
 
   return { socket }

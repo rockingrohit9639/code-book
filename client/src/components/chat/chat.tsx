@@ -65,12 +65,10 @@ export default function Chat({ className, style, conversationId }: ChatProps) {
         scrollIntoView(chatEnd.current, { behavior: 'smooth', scrollMode: 'if-needed' })
       }
 
-      socket.on('message', (message: Message) => {
-        addNewMessage(message)
-      })
+      socket.on('message', addNewMessage)
 
       return () => {
-        socket.off()
+        socket.off('message', addNewMessage)
       }
     },
     [user.id, addNewMessage, socket],

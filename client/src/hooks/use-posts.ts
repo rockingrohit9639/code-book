@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient } from 'react-query'
-import { useEffect } from 'react'
+import { useCallback, useEffect } from 'react'
 import { fetchPosts } from '~/queries/post'
 import { Comment, Like, Post } from '~/types/post'
 import { useSocketContext } from './use-socket'
@@ -9,80 +9,100 @@ export function usePosts() {
   const { socket } = useSocketContext()
   const queryClient = useQueryClient()
 
+  const handleLike = useCallback(
+    (newLike: Like) => {
+      queryClient.setQueryData<Post[]>(['posts'], (oldPosts) => {
+        if (!oldPosts) {
+          return []
+        }
+
+        return oldPosts.map((post) => {
+          if (post.id === newLike.postId) {
+            return { ...post, likes: [...post.likes, newLike] }
+          }
+          return post
+        })
+      })
+    },
+    [queryClient],
+  )
+
+  const handleDislike = useCallback(
+    (dislike: Like) => {
+      queryClient.setQueryData<Post[]>(['posts'], (oldPosts) => {
+        if (!oldPosts) {
+          return []
+        }
+
+        return oldPosts.map((post) => {
+          if (post.id === dislike.postId) {
+            return { ...post, likes: post.likes.filter((like) => like.id !== dislike.id) }
+          }
+          return post
+        })
+      })
+    },
+    [queryClient],
+  )
+
+  const handleNewComment = useCallback(
+    (newComment: Comment) => {
+      queryClient.setQueryData<Post[]>(['posts'], (oldPosts) => {
+        if (!oldPosts) {
+          return []
+        }
+
+        return oldPosts.map((post) => {
+          if (post.id === newComment.postId) {
+            return { ...post, comments: [...post.comments, newComment] }
+          }
+          return post
+        })
+      })
+    },
+    [queryClient],
+  )
+
+  const handleRemoveComment = useCallback(
+    (deletedComment: Comment) => {
+      queryClient.setQueryData<Post[]>(['posts'], (oldPosts) => {
+        if (!oldPosts) {
+          return []
+        }
+
+        return oldPosts.map((post) => {
+          if (post.id === deletedComment.postId) {
+            return { ...post, comments: post.comments.filter((comment) => comment.id !== deletedComment.id) }
+          }
+          return post
+        })
+      })
+    },
+    [queryClient],
+  )
+
   useEffect(
     function listenToLikesOrDislikes() {
       /** Listening to new likes */
-      const likeEvent = socket.on('like', (newLike: Like) => {
-        queryClient.setQueryData<Post[]>(['posts'], (oldPosts) => {
-          if (!oldPosts) {
-            return []
-          }
-
-          return oldPosts.map((post) => {
-            if (post.id === newLike.postId) {
-              return { ...post, likes: [...post.likes, newLike] }
-            }
-            return post
-          })
-        })
-      })
+      socket.on('like', handleLike)
 
       /** Listening to dislikes */
-      const dislikeEvent = socket.on('dislike', (dislike: Like) => {
-        queryClient.setQueryData<Post[]>(['posts'], (oldPosts) => {
-          if (!oldPosts) {
-            return []
-          }
-
-          return oldPosts.map((post) => {
-            if (post.id === dislike.postId) {
-              return { ...post, likes: post.likes.filter((like) => like.id !== dislike.id) }
-            }
-            return post
-          })
-        })
-      })
+      socket.on('dislike', handleDislike)
 
       /** Listening to new comments */
-      const commentEvent = socket.on('comment', (newComment: Comment) => {
-        queryClient.setQueryData<Post[]>(['posts'], (oldPosts) => {
-          if (!oldPosts) {
-            return []
-          }
-
-          return oldPosts.map((post) => {
-            if (post.id === newComment.postId) {
-              return { ...post, comments: [...post.comments, newComment] }
-            }
-            return post
-          })
-        })
-      })
+      socket.on('comment', handleNewComment)
 
       /** Listening to remove comments */
-      const removeCommentEvent = socket.on('remove-comment', (deletedComment: Comment) => {
-        queryClient.setQueryData<Post[]>(['posts'], (oldPosts) => {
-          if (!oldPosts) {
-            return []
-          }
-
-          return oldPosts.map((post) => {
-            if (post.id === deletedComment.postId) {
-              return { ...post, comments: post.comments.filter((comment) => comment.id !== deletedComment.id) }
-            }
-            return post
-          })
-        })
-      })
+      socket.on('remove-comment', handleRemoveComment)
 
       return () => {
-        likeEvent.off()
-        dislikeEvent.off()
-        commentEvent.off()
-        removeCommentEvent.off()
+        socket.off('like', handleLike)
+        socket.off('dislike', handleDislike)
+        socket.off('comment', handleNewComment)
+        socket.off('remove-comment', handleRemoveComment)
       }
     },
-    [queryClient, socket],
+    [queryClient, socket, handleLike, handleDislike, handleNewComment, handleRemoveComment],
   )
 
   return {
