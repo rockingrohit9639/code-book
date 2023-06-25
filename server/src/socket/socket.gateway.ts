@@ -19,7 +19,6 @@ export class SocketGateway implements OnGatewayInit {
     if (!client.rooms.has(room)) {
       client.join(room)
       client.broadcast.emit('new-user', client.user)
-      this.logger.log(`Client ${client.id} joined room ${room}`)
     }
   }
 }

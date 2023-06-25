@@ -2,7 +2,7 @@ import { SendOutlined } from '@ant-design/icons'
 import { Avatar, Button, Form, Input, Result } from 'antd'
 import clsx from 'clsx'
 import { useQuery, useQueryClient } from 'react-query'
-import { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useEffect, useMemo, useRef } from 'react'
 import scrollIntoView from 'scroll-into-view-if-needed'
 import { getConversationMessages } from '~/queries/message'
 import Loading from '../loading/loading'
@@ -10,6 +10,7 @@ import { getErrorMessage } from '~/utils/error'
 import { useUser } from '~/hooks/use-user'
 import { Message } from '~/types/message'
 import { useSocketContext } from '~/hooks/use-socket'
+import { getUserConversations } from '~/queries/conversation'
 
 type ChatProps = {
   className?: string
@@ -18,13 +19,40 @@ type ChatProps = {
 }
 
 export default function Chat({ className, style, conversationId }: ChatProps) {
-  const { socket } = useSocketContext()
+  const { socket, activeUsers } = useSocketContext()
   const { user } = useUser()
   const queryClient = useQueryClient()
   const [form] = Form.useForm()
   const chatEnd = useRef<HTMLDivElement>(null)
 
   const messages = useQuery(['messages', conversationId], () => getConversationMessages(conversationId))
+  const conversations = useQuery(['conversations'], getUserConversations)
+
+  const conversation = useMemo(() => {
+    if (!conversations?.data) {
+      return null
+    }
+
+    return conversations.data.find((conversation) => conversation.id === conversationId)
+  }, [conversationId, conversations.data])
+
+  const usernameToShow = useMemo(() => {
+    if (!conversation) {
+      return ''
+    }
+
+    return `${conversation.users.map((user) => user.username).join(', ')} & ${conversation.createdBy.username}`
+  }, [conversation])
+
+  const isUserActive = useMemo(() => {
+    if (!conversation) {
+      return false
+    }
+
+    const allUsers = [...conversation.users, conversation.createdBy].filter((_user) => _user.id !== user.id)
+
+    return allUsers.some((_user) => activeUsers?.map((activeUser) => activeUser.id)?.includes(_user?.id ?? ''))
+  }, [activeUsers, conversation, user.id])
 
   const addNewMessage = useCallback(
     (message: Message) => {
@@ -110,7 +138,14 @@ export default function Chat({ className, style, conversationId }: ChatProps) {
 
   return (
     <div className={clsx('flex h-full flex-col', className)} style={style}>
-      <div className="space-y-2 overflow-y-scroll p-4" style={{ height: 'calc(100vh - 80px)' }}>
+      <div className="flex h-16 items-center border-b-2 px-4">
+        <div className="flex items-center gap-2">
+          <Avatar className="uppercase">{usernameToShow[0]}</Avatar>
+          <div>{usernameToShow}</div>
+          {isUserActive ? <div className="h-3 w-3 rounded-full bg-green-600" /> : null}
+        </div>
+      </div>
+      <div className="space-y-2 overflow-y-scroll p-4" style={{ height: 'calc(100vh - 144px)' }}>
         {messages.data.map((message) => (
           <div
             key={message.id}
