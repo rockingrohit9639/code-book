@@ -6,7 +6,6 @@ import { AiOutlineEdit } from 'react-icons/ai'
 import { useQuery } from 'react-query'
 import { Link, useParams } from 'react-router-dom'
 import Chat from '~/components/chat'
-import Page from '~/components/page'
 import { useAppShellContext } from '~/hooks/use-app-shell'
 import { useUser } from '~/hooks/use-user'
 import { getUserConversations } from '~/queries/conversation'
@@ -54,8 +53,8 @@ export default function Messages() {
             to={`/messages/${conversation.id}`}
             key={conversation.id}
             className={clsx(
-              'flex cursor-pointer items-center gap-2 rounded-lg border-2 border-transparent px-4 py-2 transition-all delay-75 hover:border-gray-200',
-              conversationId === conversation.id && 'border-gray-200',
+              'flex cursor-pointer items-center gap-2 p-2 hover:bg-gray-200',
+              conversationId === conversation.id && 'bg-gray-200',
             )}
           >
             <Avatar className="uppercase">{userToShow.username[0]}</Avatar>
@@ -72,13 +71,13 @@ export default function Messages() {
   }, [conversations, user.id, conversationId])
 
   return (
-    <Page className="grid grid-cols-12">
-      <div className="col-span-3 space-y-2 overflow-hidden border-r-2 px-4">
+    <div className="grid h-screen grid-cols-12">
+      <div className="col-span-3 space-y-2 overflow-hidden border-r-2">
         <div className="flex items-center justify-end p-4">
           <AiOutlineEdit className="h-6 w-6 cursor-pointer" />
         </div>
-        <div>Messages</div>
-        <div className="space-y-2">{conversationsContent}</div>
+        <div className="px-4">Messages</div>
+        <div className="divide-y">{conversationsContent}</div>
       </div>
       {conversationId ? (
         <Chat className="col-span-9" conversationId={conversationId} />
@@ -87,6 +86,6 @@ export default function Messages() {
           <Empty description="Please select a chat to start conversation" />
         </div>
       )}
-    </Page>
+    </div>
   )
 }

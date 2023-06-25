@@ -43,6 +43,12 @@ export default function Chat({ className, style, conversationId }: ChatProps) {
     [queryClient, conversationId],
   )
 
+  const handleScrollIntoView = () => {
+    if (chatEnd.current) {
+      scrollIntoView(chatEnd.current, { behavior: 'smooth', scrollMode: 'if-needed' })
+    }
+  }
+
   const handleSendMessage = useCallback(
     (values: { content: string }) => {
       socket.emit('message', { content: values.content, conversation: conversationId, from: user.id })
@@ -53,6 +59,8 @@ export default function Chat({ className, style, conversationId }: ChatProps) {
         fromId: user.id,
         id: Date.now().toString(),
       } as unknown as Message)
+
+      handleScrollIntoView()
 
       form.resetFields()
     },
@@ -67,8 +75,11 @@ export default function Chat({ className, style, conversationId }: ChatProps) {
 
       socket.on('message', addNewMessage)
 
+      window.addEventListener('load', handleScrollIntoView)
+
       return () => {
         socket.off('message', addNewMessage)
+        window.removeEventListener('load', handleScrollIntoView)
       }
     },
     [user.id, addNewMessage, socket],
