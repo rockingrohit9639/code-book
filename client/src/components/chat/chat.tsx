@@ -1,9 +1,10 @@
 import { SendOutlined } from '@ant-design/icons'
-import { Button, Form, Input, Result } from 'antd'
+import { Avatar, Button, Form, Input, Result } from 'antd'
 import clsx from 'clsx'
 import { useQuery, useQueryClient } from 'react-query'
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { io } from 'socket.io-client'
+import scrollIntoView from 'scroll-into-view-if-needed'
 import { getConversationMessages } from '~/queries/message'
 import Loading from '../loading/loading'
 import { getErrorMessage } from '~/utils/error'
@@ -23,6 +24,7 @@ export default function Chat({ className, style, conversationId }: ChatProps) {
   const { user } = useUser()
   const queryClient = useQueryClient()
   const [form] = Form.useForm()
+  const chatEnd = useRef<HTMLDivElement>(null)
 
   const messages = useQuery(['messages', conversationId], () => getConversationMessages(conversationId))
 
@@ -35,6 +37,10 @@ export default function Chat({ className, style, conversationId }: ChatProps) {
 
         return [...prevMessages, message]
       })
+
+      if (chatEnd.current) {
+        scrollIntoView(chatEnd.current, { behavior: 'smooth', scrollMode: 'if-needed' })
+      }
     },
     [queryClient, conversationId],
   )
@@ -43,15 +49,26 @@ export default function Chat({ className, style, conversationId }: ChatProps) {
     (values: { content: string }) => {
       socket.emit('message', { content: values.content, conversation: conversationId, from: user.id })
 
-      addNewMessage({ content: values.content, from: user.id, id: Date.now().toString() } as unknown as Message)
+      addNewMessage({
+        content: values.content,
+        from: user,
+        fromId: user.id,
+        id: Date.now().toString(),
+      } as unknown as Message)
 
       form.resetFields()
     },
-    [conversationId, user.id, form, addNewMessage],
+    [conversationId, user, form, addNewMessage],
   )
 
   useEffect(
-    function handleChatting() {
+    function handleChattingAndScrollIntoView() {
+      const handleScrollIntoView = () => {
+        if (chatEnd.current) {
+          scrollIntoView(chatEnd.current, { behavior: 'smooth', scrollMode: 'if-needed' })
+        }
+      }
+
       socket.on('connect', () => {
         socket.emit('joinChatRoom', `/chat/${user.id}`)
       })
@@ -60,6 +77,7 @@ export default function Chat({ className, style, conversationId }: ChatProps) {
         addNewMessage(message)
       })
 
+      window.requestAnimationFrame(handleScrollIntoView)
       return () => {
         socket.off()
       }
@@ -81,10 +99,26 @@ export default function Chat({ className, style, conversationId }: ChatProps) {
 
   return (
     <div className={clsx('flex h-full flex-col', className)} style={style}>
-      <div className="flex-1">
+      <div className="space-y-2 overflow-y-scroll p-4" style={{ height: 'calc(100vh - 80px)' }}>
         {messages.data.map((message) => (
-          <div key={message.id}>{message.content}</div>
+          <div
+            key={message.id}
+            className={clsx('flex items-end gap-1', message.fromId === user.id && 'flex-row-reverse')}
+          >
+            <Avatar className="uppercase" size="small">
+              {message.from.username[0]}
+            </Avatar>
+            <div
+              className={clsx(
+                'w-max rounded-full px-4 py-1 text-white',
+                message.fromId === user.id ? 'bg-gray-500' : 'bg-primary',
+              )}
+            >
+              {message.content}
+            </div>
+          </div>
         ))}
+        <div ref={chatEnd} className="h-4" />
       </div>
       <div className="h-20 border-t-2">
         <Form form={form} className="flex h-full w-full items-center justify-center p-4" onFinish={handleSendMessage}>
