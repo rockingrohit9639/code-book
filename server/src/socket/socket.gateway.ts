@@ -13,10 +13,9 @@ export class SocketGateway implements OnGatewayInit {
 
   @SubscribeMessage('joinRoom')
   handleRoomJoin(client: Socket, room: string) {
-    const globalRoom = `/global/${room}`
-    if (!client.rooms.has(globalRoom)) {
-      client.join(globalRoom)
-      this.logger.log(`Client ${client.id} joined room ${globalRoom}`)
+    if (!client.rooms.has(room)) {
+      client.join(room)
+      this.logger.log(`Client ${client.id} joined room ${room}`)
     }
   }
 }

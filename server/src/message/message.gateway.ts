@@ -15,23 +15,14 @@ export class MessageGateway implements OnGatewayInit {
     this.logger.log('Initialized Message Gateway!')
   }
 
-  @SubscribeMessage('joinChatRoom')
-  handleJoinChatRoom(client: Socket, userId: string) {
-    const chatRoom = `/chat/${userId}`
-
-    if (!client.rooms.has(chatRoom)) {
-      client.join(chatRoom)
-      this.logger.log(`Client ${client.id} joined room ${chatRoom}`)
-    }
-  }
-
   @SubscribeMessage('message')
   async handleNewMessage(client: Socket, payload: CreateMessageDto) {
     const newMessage = await this.messageService.createMessage(payload)
 
-    const to = [newMessage.conversation.createdById, ...newMessage.conversation.userIds]
-      .filter((id) => id !== payload.from)
-      .map((id) => `/chat/${id}`)
+    const to = [newMessage.conversation.createdById, ...newMessage.conversation.userIds].filter(
+      (id) => id !== payload.from,
+    )
+
     if (to.length) {
       client.to(to).emit('message', newMessage)
     }

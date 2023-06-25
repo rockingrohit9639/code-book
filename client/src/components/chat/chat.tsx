@@ -65,7 +65,6 @@ export default function Chat({ className, style, conversationId }: ChatProps) {
         scrollIntoView(chatEnd.current, { behavior: 'smooth', scrollMode: 'if-needed' })
       }
 
-      socket.emit('joinChatRoom', user.id)
       socket.on('message', (message: Message) => {
         addNewMessage(message)
       })

@@ -27,7 +27,7 @@ export class NotificationService {
       include: NOTIFICATION_INCLUDE_FIELDS,
     })
 
-    this.socketGateway.wss.volatile.to(to.map((t) => `/global/${t}`)).emit('notification', notification)
+    this.socketGateway.wss.to(to).emit('notification', notification)
     return notification
   }
 

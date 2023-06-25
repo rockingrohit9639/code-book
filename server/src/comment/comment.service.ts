@@ -40,9 +40,9 @@ export class CommentService {
     ])
 
     /** Emitting the event to add comment on every follower's feed */
-    const to = post.createdBy.followerIds.filter((id) => id !== user.id).map((id) => `/global/${id}`)
+    const to = post.createdBy.followerIds.filter((id) => id !== user.id)
     if (to.length) {
-      this.socketGateway.wss.volatile.to(to).emit('comment', commentCreated)
+      this.socketGateway.wss.to(to).emit('comment', commentCreated)
     }
 
     return commentCreated
@@ -64,9 +64,9 @@ export class CommentService {
     const deletedComment = await this.prismaService.comment.delete({ where: { id } })
 
     /** Emitting the event to remove comment from every follower's feed */
-    const to = post.createdBy.followerIds.filter((id) => id !== user.id).map((id) => `/global/${id}`)
+    const to = post.createdBy.followerIds.filter((id) => id !== user.id)
     if (to.length) {
-      this.socketGateway.wss.volatile.to(to).emit('remove-comment', deletedComment)
+      this.socketGateway.wss.to(to).emit('remove-comment', deletedComment)
     }
 
     return deletedComment

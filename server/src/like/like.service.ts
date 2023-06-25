@@ -31,9 +31,9 @@ export class LikeService {
     ])
 
     /** Emitting the event to all the followers to update likes */
-    const to = post.createdBy.followerIds.filter((id) => id !== user.id).map((id) => `/global/${id}`)
+    const to = post.createdBy.followerIds.filter((id) => id !== user.id)
     if (to.length) {
-      this.socketGateway.wss.volatile.to(to).emit('like', likeCreated)
+      this.socketGateway.wss.to(to).emit('like', likeCreated)
     }
 
     return likeCreated
@@ -58,9 +58,9 @@ export class LikeService {
     const dislike = await this.prismaService.like.delete({ where: { id: like.id } })
 
     /** Emitting the event to all the followers to update likes */
-    const to = post.createdBy.followerIds.filter((id) => id !== user.id).map((id) => `/global/${id}`)
+    const to = post.createdBy.followerIds.filter((id) => id !== user.id)
     if (to.length) {
-      this.socketGateway.wss.volatile.to(to).emit('dislike', dislike)
+      this.socketGateway.wss.to(to).emit('dislike', dislike)
     }
 
     return dislike
