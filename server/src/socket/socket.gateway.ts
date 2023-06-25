@@ -2,12 +2,7 @@ import { WebSocketGateway, OnGatewayInit, WebSocketServer, SubscribeMessage } fr
 import { Logger } from '@nestjs/common'
 import { Socket, Server } from 'socket.io'
 
-@WebSocketGateway({
-  namespace: 'global',
-  cors: {
-    origin: '*',
-  },
-})
+@WebSocketGateway({ cors: { origin: '*' } })
 export class SocketGateway implements OnGatewayInit {
   @WebSocketServer() wss: Server
   private logger: Logger = new Logger('SocketGateway')
@@ -18,9 +13,10 @@ export class SocketGateway implements OnGatewayInit {
 
   @SubscribeMessage('joinRoom')
   handleRoomJoin(client: Socket, room: string) {
-    if (!client.rooms.has(room)) {
-      client.join(room)
-      this.logger.log(`Client ${client.id} joined room ${room}`)
+    const globalRoom = `/global/${room}`
+    if (!client.rooms.has(globalRoom)) {
+      client.join(globalRoom)
+      this.logger.log(`Client ${client.id} joined room ${globalRoom}`)
     }
   }
 }

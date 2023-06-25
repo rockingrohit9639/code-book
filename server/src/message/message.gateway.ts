@@ -4,10 +4,7 @@ import { Socket, Server } from 'socket.io'
 import { CreateMessageDto } from './message.dto'
 import { MessageService } from './message.service'
 
-@WebSocketGateway({
-  namespace: 'messages',
-  cors: { origin: '*' },
-})
+@WebSocketGateway({ cors: { origin: '*' } })
 export class MessageGateway implements OnGatewayInit {
   @WebSocketServer() wss: Server
   private logger: Logger = new Logger('MessageGateway')
@@ -19,10 +16,12 @@ export class MessageGateway implements OnGatewayInit {
   }
 
   @SubscribeMessage('joinChatRoom')
-  handleJoinChatRoom(client: Socket, room: string) {
-    if (!client.rooms.has(room)) {
-      client.join(room)
-      this.logger.log(`Client ${client.id} joined room ${room}`)
+  handleJoinChatRoom(client: Socket, userId: string) {
+    const chatRoom = `/chat/${userId}`
+
+    if (!client.rooms.has(chatRoom)) {
+      client.join(chatRoom)
+      this.logger.log(`Client ${client.id} joined room ${chatRoom}`)
     }
   }
 

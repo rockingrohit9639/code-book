@@ -1,15 +1,24 @@
 import { Result } from 'antd'
 import { range } from 'lodash'
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import Page from '~/components/page'
 import Post from '~/components/post'
+import { useAppShellContext } from '~/hooks/use-app-shell'
 import useError from '~/hooks/use-error'
 import { usePosts } from '~/hooks/use-posts'
 
 export default function Home() {
+  const { setIsSiderCollapsed } = useAppShellContext()
   const { posts, isLoading, error } = usePosts()
   const { getErrorMessage } = useError()
+
+  useEffect(
+    function openSider() {
+      setIsSiderCollapsed(false)
+    },
+    [setIsSiderCollapsed],
+  )
 
   const content = useMemo(() => {
     if (isLoading) {

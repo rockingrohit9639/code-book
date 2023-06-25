@@ -3,14 +3,13 @@ import { Avatar, Button, Form, Input, Result } from 'antd'
 import clsx from 'clsx'
 import { useQuery, useQueryClient } from 'react-query'
 import { useCallback, useEffect, useRef } from 'react'
-import { io } from 'socket.io-client'
 import scrollIntoView from 'scroll-into-view-if-needed'
 import { getConversationMessages } from '~/queries/message'
 import Loading from '../loading/loading'
 import { getErrorMessage } from '~/utils/error'
 import { useUser } from '~/hooks/use-user'
-import { ENV } from '~/utils/env'
 import { Message } from '~/types/message'
+import { useSocketContext } from '~/hooks/use-socket'
 
 type ChatProps = {
   className?: string
@@ -18,9 +17,8 @@ type ChatProps = {
   conversationId: string
 }
 
-const socket = io(`${ENV.VITE_API_BASE_URL}/messages`)
-
 export default function Chat({ className, style, conversationId }: ChatProps) {
+  const { socket } = useSocketContext()
   const { user } = useUser()
   const queryClient = useQueryClient()
   const [form] = Form.useForm()
@@ -63,26 +61,20 @@ export default function Chat({ className, style, conversationId }: ChatProps) {
 
   useEffect(
     function handleChattingAndScrollIntoView() {
-      const handleScrollIntoView = () => {
-        if (chatEnd.current) {
-          scrollIntoView(chatEnd.current, { behavior: 'smooth', scrollMode: 'if-needed' })
-        }
+      if (chatEnd.current) {
+        scrollIntoView(chatEnd.current, { behavior: 'smooth', scrollMode: 'if-needed' })
       }
 
-      socket.on('connect', () => {
-        socket.emit('joinChatRoom', `/chat/${user.id}`)
-      })
-
+      socket.emit('joinChatRoom', user.id)
       socket.on('message', (message: Message) => {
         addNewMessage(message)
       })
 
-      window.requestAnimationFrame(handleScrollIntoView)
       return () => {
         socket.off()
       }
     },
-    [user.id, addNewMessage],
+    [user.id, addNewMessage, socket],
   )
 
   if (messages.isLoading) {
@@ -126,9 +118,15 @@ export default function Chat({ className, style, conversationId }: ChatProps) {
             <Form.Item name="content" className="w-full" rules={[{ required: true, message: 'Please enter message!' }]}>
               <Input placeholder="What is on your mind?" />
             </Form.Item>
-            <Button icon={<SendOutlined />} htmlType="submit" type="primary">
-              Send
-            </Button>
+            <Form.Item noStyle dependencies={['content']}>
+              {({ getFieldValue }) => {
+                return (
+                  <Button icon={<SendOutlined />} htmlType="submit" type="primary" disabled={!getFieldValue('content')}>
+                    Send
+                  </Button>
+                )
+              }}
+            </Form.Item>
           </div>
         </Form>
       </div>

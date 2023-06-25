@@ -6,13 +6,13 @@ import { useAuthContext } from './use-auth'
 
 export function useSocket() {
   const { user } = useAuthContext()
-  const socket = io(`${ENV.VITE_API_BASE_URL}/global`)
+  const socket = io(ENV.VITE_API_BASE_URL)
 
   useEffect(
     function joinRoom() {
       socket.on('connect', () => {
         if (user?.id) {
-          socket.emit('joinRoom', `/global/${user.id}`)
+          socket.emit('joinRoom', user.id)
         }
       })
 
