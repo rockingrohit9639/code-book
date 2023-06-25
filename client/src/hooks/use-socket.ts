@@ -6,7 +6,17 @@ import { useAuthContext } from './use-auth'
 
 export function useSocket() {
   const { user } = useAuthContext()
-  const socket = io(ENV.VITE_API_BASE_URL)
+  const accessToken = localStorage.getItem(ENV.VITE_BEARER_TOKEN_KEY)
+
+  const socket = io(ENV.VITE_API_BASE_URL, {
+    transportOptions: {
+      polling: {
+        extraHeaders: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      },
+    },
+  })
 
   const joinRoom = useCallback(() => {
     if (user?.id) {
@@ -16,7 +26,9 @@ export function useSocket() {
 
   useEffect(
     function joinRoomOnMount() {
-      socket.on('connect', joinRoom)
+      if (user?.id) {
+        socket.on('connect', joinRoom)
+      }
 
       return () => {
         socket.off('joinRoom', joinRoom)
@@ -24,6 +36,12 @@ export function useSocket() {
     },
     [user, socket, joinRoom],
   )
+
+  useEffect(() => {
+    socket.on('new-user', (user: any) => {
+      console.log('New User Detected', user)
+    })
+  }, [socket])
 
   return { socket }
 }
