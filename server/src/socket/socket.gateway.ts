@@ -3,7 +3,7 @@ import { Logger } from '@nestjs/common'
 import { Socket, Server } from 'socket.io'
 import { JwtPayload } from '~/auth/jwt/jwt.type'
 
-type SocketWithUser = Socket & { user: JwtPayload }
+export type SocketWithUser = Socket & { user: JwtPayload }
 
 @WebSocketGateway({ cors: { origin: '*' } })
 export class SocketGateway implements OnGatewayInit {

@@ -30,3 +30,5 @@ export type User = {
 export type UpdateProfileDto = Partial<
   Pick<User, 'firstName' | 'lastName' | 'bio' | 'dob' | 'website' | 'github' | 'linkedin' | 'email'>
 >
+
+export type BasicUser = Pick<User, 'id' | 'email' | 'username' | 'firstName' | 'lastName'>
