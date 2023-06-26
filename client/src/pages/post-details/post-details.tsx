@@ -10,6 +10,7 @@ import Comments from '~/components/comments'
 import DeletePostModal from '~/components/delete-post-modal'
 import Loading from '~/components/loading'
 import Page from '~/components/page'
+import SharePost from '~/components/share-post'
 import useError from '~/hooks/use-error'
 import { usePosts } from '~/hooks/use-posts'
 import { useUser } from '~/hooks/use-user'
@@ -142,23 +143,31 @@ export default function PostDetails() {
       ) : null}
 
       <div className="rounded-lg bg-white shadow-sm">
-        <div className="flex items-center space-x-4 p-4">
-          <div className="cursor-pointer" onClick={handleLikeOrUnlike}>
-            {isPostLiked ? (
-              <AiFillHeart className="h-6 w-6 text-red-500 hover:text-red-300" />
-            ) : (
-              <AiOutlineHeart className="h-6 w-6 hover:text-gray-500" />
-            )}
+        <div className="space-y-2 p-4">
+          <div className="flex items-center space-x-4">
+            <div className="cursor-pointer" onClick={handleLikeOrUnlike}>
+              {isPostLiked ? (
+                <AiFillHeart className="h-6 w-6 text-red-500 hover:text-red-300" />
+              ) : (
+                <AiOutlineHeart className="h-6 w-6 hover:text-gray-500" />
+              )}
+            </div>
+
+            <SharePost
+              title={post?.title ?? ''}
+              postId={post?.id ?? ''}
+              trigger={
+                <div className="cursor-pointer">
+                  <AiOutlineShareAlt className="h-6 w-6 hover:text-gray-500" />
+                </div>
+              }
+            />
           </div>
 
-          <div className="cursor-pointer">
-            <AiOutlineShareAlt className="h-6 w-6 hover:text-gray-500" />
+          <div className="flex items-center space-x-4">
+            <div className="text-sm">{post?.likes?.length ?? 0} likes</div>
+            <div className="text-sm">{post?.comments?.length ?? 0} comments</div>
           </div>
-        </div>
-
-        <div className="flex items-center space-x-4 px-4">
-          <div className="text-sm">{post?.likes?.length ?? 0} likes</div>
-          <div className="text-sm">{post?.comments?.length ?? 0} comments</div>
         </div>
 
         <Comments

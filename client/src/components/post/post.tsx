@@ -9,6 +9,7 @@ import { fetchFileById } from '~/queries/file'
 import { likePost, unlikePost } from '~/queries/post'
 import useError from '~/hooks/use-error'
 import { useUser } from '~/hooks/use-user'
+import SharePost from '../share-post'
 
 type PostProps = {
   className?: string
@@ -121,9 +122,15 @@ export default function Post({ className, style, post }: PostProps) {
           <AiOutlineComment className="h-6 w-6 hover:text-gray-500" />
         </div>
 
-        <div className="cursor-pointer">
-          <AiOutlineShareAlt className="h-6 w-6 hover:text-gray-500" />
-        </div>
+        <SharePost
+          title={post.title}
+          postId={post.id}
+          trigger={
+            <div className="cursor-pointer">
+              <AiOutlineShareAlt className="h-6 w-6 hover:text-gray-500" />
+            </div>
+          }
+        />
       </div>
 
       <div className="flex items-center space-x-4">
