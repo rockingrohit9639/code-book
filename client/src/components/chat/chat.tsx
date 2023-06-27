@@ -175,7 +175,7 @@ export default function Chat({ className, style, conversationId }: ChatProps) {
                 message.fromId === user.id ? 'bg-gray-500' : 'bg-primary',
               )}
             >
-              {message.content}
+              {decrypt(message.content)}
             </div>
           </div>
         ))}
