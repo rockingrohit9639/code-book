@@ -12,6 +12,7 @@ import { Message } from '~/types/message'
 import { useSocketContext } from '~/hooks/use-socket'
 import { getUserConversations } from '~/queries/conversation'
 import { BasicUser } from '~/types/user'
+import { decrypt, encrypt } from '~/utils/crypto'
 
 type ChatProps = {
   className?: string
@@ -79,9 +80,19 @@ export default function Chat({ className, style, conversationId }: ChatProps) {
     }
   }
 
+  const handleNewMessage = useCallback(
+    (message: Message) => {
+      const decryptedMessage = decrypt(message.content)
+      addNewMessage({ ...message, content: decryptedMessage })
+    },
+    [addNewMessage],
+  )
+
   const handleSendMessage = useCallback(
     (values: { content: string }) => {
-      socket.emit('message', { content: values.content, conversation: conversationId, from: user.id })
+      const encryptedMessage = encrypt(values.content)
+
+      socket.emit('message', { content: encryptedMessage, conversation: conversationId, from: user.id })
 
       addNewMessage({
         content: values.content,
@@ -112,19 +123,19 @@ export default function Chat({ className, style, conversationId }: ChatProps) {
   useEffect(
     function handleChattingAndScrollIntoView() {
       socket.emit('joinConversation', conversationId)
-      socket.on('message', addNewMessage)
+      socket.on('message', handleNewMessage)
       socket.on('typing-start', handleTypingUser)
       socket.on('typing-stop', handleTypingEnd)
 
       window.addEventListener('load', handleScrollIntoView)
       return () => {
-        socket.off('message', addNewMessage)
+        socket.off('message', handleNewMessage)
         socket.off('typing-start', handleTypingUser)
         socket.emit('leaveConversation', conversationId)
         window.removeEventListener('load', handleScrollIntoView)
       }
     },
-    [addNewMessage, socket, handleTypingUser, conversationId, handleTypingEnd],
+    [handleNewMessage, socket, handleTypingUser, conversationId, handleTypingEnd],
   )
 
   if (messages.isLoading) {
