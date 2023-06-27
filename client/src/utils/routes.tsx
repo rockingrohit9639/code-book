@@ -4,7 +4,7 @@ import SearchUsersDrawer from '~/components/search-users-drawer'
 
 type BaseRoute = {
   id: string
-  name: React.ReactNode
+  item: React.ReactNode
   icon: React.ReactElement<{ className?: string }>
 }
 
@@ -16,6 +16,7 @@ type Route = BaseRoute & {
 
 type ReactNode = BaseRoute & {
   type: 'REACT_NODE'
+  secondaryItem: React.ReactNode
 }
 
 type AppShellRoute = Route | ReactNode
@@ -23,7 +24,7 @@ type AppShellRoute = Route | ReactNode
 export const ROUTES: AppShellRoute[] = [
   {
     id: 'home',
-    name: 'Home',
+    item: 'Home',
     icon: <AiOutlineHome />,
     path: '/',
     patterns: ['/'],
@@ -31,22 +32,56 @@ export const ROUTES: AppShellRoute[] = [
   },
   {
     id: 'messages',
-    name: 'Messages',
+    item: 'Messages',
     icon: <AiOutlineMessage />,
     path: '/messages',
-    patterns: ['/messages'],
+    patterns: ['/messages', '/messaged/:conversationId'],
     type: 'ROUTE',
   },
   {
     id: 'notifications',
-    name: <NotificationsDrawer trigger={<div className="text-gray-400 hover:text-white">Notifications</div>} />,
+    item: (
+      <NotificationsDrawer
+        trigger={
+          <div className="hover:bg-primary cursor-pointer rounded px-4 py-2 text-gray-400 hover:text-gray-200">
+            Notifications
+          </div>
+        }
+      />
+    ),
     icon: <AiOutlineNotification />,
     type: 'REACT_NODE',
+    secondaryItem: (
+      <NotificationsDrawer
+        trigger={
+          <div className="hover:bg-primary h-max w-max cursor-pointer rounded px-4 py-2 text-gray-400 hover:text-gray-200">
+            <AiOutlineNotification className="h-6 w-6" />
+          </div>
+        }
+      />
+    ),
   },
   {
     id: 'search',
-    name: <SearchUsersDrawer trigger={<div>Search</div>} />,
+    item: (
+      <SearchUsersDrawer
+        trigger={
+          <div className="hover:bg-primary h-max w-max cursor-pointer rounded px-4 py-2 text-gray-400 hover:text-gray-200">
+            Search
+          </div>
+        }
+      />
+    ),
     icon: <AiOutlineSearch />,
     type: 'REACT_NODE',
+    secondaryItem: (
+      <SearchUsersDrawer
+        trigger={
+          <div className="hover:bg-primary h-max w-max cursor-pointer rounded px-4 py-2 text-gray-400 hover:text-gray-200">
+            <AiOutlineSearch className="h-6 w-6" />
+          </div>
+        }
+      />
+    ),
   },
 ]
