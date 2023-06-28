@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post as PostRoute, UseGuards } from '@nestjs/common'
-import { Post } from '@prisma/client'
+import { Post, View } from '@prisma/client'
 import { PostService } from './post.service'
 import { CreatePostDto, UpdatePostDto } from './post.dto'
 import { GetUser } from '~/auth/user.decorator'
@@ -38,5 +38,10 @@ export class PostController {
   @Delete(':id')
   delete(@Param('id') id: string, @GetUser() user: UserWithoutSensitiveData): Promise<Post> {
     return this.postService.delete(id, user)
+  }
+
+  @PostRoute('views/:id')
+  addViewOnPost(@Param('id') id: string, @GetUser() user: UserWithoutSensitiveData): Promise<View> {
+    return this.postService.addViewOnPost(id, user)
   }
 }

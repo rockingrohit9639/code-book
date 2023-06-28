@@ -42,7 +42,7 @@ export default function Sidebar(props: SidebarProps) {
                       key={route.id}
                       className={clsx(
                         'hover:bg-primary h-max w-max rounded px-4 py-2 text-gray-400 hover:text-gray-200',
-                        activeRoute?.id === route.id && 'bg-primary text-gray-200',
+                        activeRoute?.id === route.id && 'bg-primary !text-gray-200',
                       )}
                     >
                       {isSiderCollapsed ? cloneElement(route.icon, { className: 'w-6 h-6' }) : route.item}
