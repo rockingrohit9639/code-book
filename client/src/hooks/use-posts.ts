@@ -1,14 +1,18 @@
-import { useQuery, useQueryClient } from 'react-query'
+import { useMutation, useQuery, useQueryClient } from 'react-query'
 import { useCallback, useEffect } from 'react'
-import { fetchPosts } from '~/queries/post'
+import constate from 'constate'
+import { fetchPosts, likePost, unlikePost } from '~/queries/post'
 import { Comment, Like, Post } from '~/types/post'
 import { useSocketContext } from './use-socket'
+import useError from './use-error'
 
 export function usePosts() {
   const { data, isLoading, error } = useQuery(['posts'], fetchPosts)
   const { socket } = useSocketContext()
   const queryClient = useQueryClient()
+  const { handleError } = useError()
 
+  /** Handling socket events */
   const handleLike = useCallback(
     (newLike: Like) => {
       queryClient.setQueryData<Post[]>(['posts'], (oldPosts) => {
@@ -81,6 +85,41 @@ export function usePosts() {
     [queryClient],
   )
 
+  /** Handling user requests */
+  const likePostMutation = useMutation(likePost, {
+    onError: handleError,
+    onSuccess: (like) => {
+      queryClient.setQueryData<Post[]>(['posts'], (prev) => {
+        if (!prev) return []
+
+        return prev.map((post) => {
+          if (post.id === like.postId) {
+            return { ...post, likes: [...post.likes, like] }
+          }
+
+          return post
+        })
+      })
+    },
+  })
+
+  const unLikePostMutation = useMutation(unlikePost, {
+    onError: handleError,
+    onSuccess: (like) => {
+      queryClient.setQueryData<Post[]>(['posts'], (prev) => {
+        if (!prev) return []
+
+        return prev.map((post) => {
+          if (post.id === like.postId) {
+            return { ...post, likes: post.likes.filter((_like) => _like.id !== like.id) }
+          }
+
+          return post
+        })
+      })
+    },
+  })
+
   useEffect(
     function listenToLikesOrDislikes() {
       /** Listening to new likes */
@@ -109,5 +148,9 @@ export function usePosts() {
     posts: data,
     isLoading,
     error,
+    likePostMutation,
+    unLikePostMutation,
   }
 }
+
+export const [PostsProvider, usePostsContext] = constate(usePosts)

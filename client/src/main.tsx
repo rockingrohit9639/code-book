@@ -12,6 +12,7 @@ import { queryClient } from './utils/client'
 import { AuthProvider } from './hooks/use-auth'
 import { AppShellProvider } from './hooks/use-app-shell'
 import { SocketProvider } from './hooks/use-socket'
+import { PostsProvider } from './hooks/use-posts'
 
 dayjs.extend(relativeTime)
 
@@ -23,7 +24,9 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
           <ConfigProvider theme={ANTD_THEME}>
             <SocketProvider>
               <AppShellProvider>
-                <App />
+                <PostsProvider>
+                  <App />
+                </PostsProvider>
               </AppShellProvider>
             </SocketProvider>
           </ConfigProvider>

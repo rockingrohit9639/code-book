@@ -1,5 +1,5 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common'
-import { Post, View } from '@prisma/client'
+import { Post } from '@prisma/client'
 import { PrismaService } from '~/prisma/prisma.service'
 import { CreatePostDto, UpdatePostDto } from './post.dto'
 import { UserWithoutSensitiveData } from '~/user/user.type'
@@ -75,16 +75,17 @@ export class PostService {
     return this.prismaService.post.delete({ where: { id: post.id } })
   }
 
-  async addViewOnPost(id: string, user: UserWithoutSensitiveData): Promise<View> {
+  async addViewOnPost(id: string, user: UserWithoutSensitiveData): Promise<Post> {
+    const post = await this.findOneById(id)
     const existedViewForUser = await this.prismaService.view.findFirst({
-      where: { userId: user.id, postId: id },
+      where: { userId: user.id, postId: post.id },
     })
 
     if (existedViewForUser) {
-      return existedViewForUser
+      return post
     }
 
-    const [viewCreated] = await this.prismaService.$transaction([
+    const [, postWithUpdatedViews] = await this.prismaService.$transaction([
       this.prismaService.view.create({
         data: { userId: user.id, postId: id },
       }),
@@ -94,6 +95,6 @@ export class PostService {
       }),
     ])
 
-    return viewCreated
+    return postWithUpdatedViews
   }
 }

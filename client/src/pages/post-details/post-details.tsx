@@ -4,18 +4,16 @@ import dayjs from 'dayjs'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { AiFillHeart, AiOutlineCopy, AiOutlineDelete, AiOutlineHeart, AiOutlineShareAlt } from 'react-icons/ai'
 import { HiOutlineDotsVertical } from 'react-icons/hi'
-import { useMutation, useQuery, useQueryClient } from 'react-query'
+import { useQuery } from 'react-query'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import Comments from '~/components/comments'
 import DeletePostModal from '~/components/delete-post-modal'
 import Loading from '~/components/loading'
 import Page from '~/components/page'
 import SharePost from '~/components/share-post'
-import useError from '~/hooks/use-error'
-import { usePosts } from '~/hooks/use-posts'
+import { usePostsContext } from '~/hooks/use-posts'
 import { useUser } from '~/hooks/use-user'
 import { fetchFileById } from '~/queries/file'
-import { likePost, unlikePost } from '~/queries/post'
 import { Post } from '~/types/post'
 import { getErrorMessage } from '~/utils/error'
 
@@ -23,10 +21,8 @@ export default function PostDetails() {
   const [isPostLiked, setIsPostLiked] = useState<boolean | undefined>()
   const { user } = useUser()
   const { id } = useParams() as { id: string }
-  const { handleError } = useError()
-  const queryClient = useQueryClient()
   const navigate = useNavigate()
-  const { posts, isLoading, error } = usePosts()
+  const { posts, isLoading, error, likePostMutation, unLikePostMutation } = usePostsContext()
 
   const post = useMemo(() => {
     return posts?.find((p) => p.id === id)
@@ -34,30 +30,6 @@ export default function PostDetails() {
 
   const postImage = useQuery(['post-image', id], () => fetchFileById(post?.imageId!), {
     enabled: Boolean(post?.imageId),
-  })
-
-  const likePostMutation = useMutation(likePost, {
-    onError: handleError,
-    onSuccess: (like) => {
-      queryClient.setQueryData<Post>(['post', id], (prev) => {
-        if (!prev) return {} as Post
-
-        return { ...prev, likes: [...(prev.likes ?? []), like] }
-      })
-      setIsPostLiked(true)
-    },
-  })
-
-  const unLikePostMutation = useMutation(unlikePost, {
-    onError: handleError,
-    onSuccess: (like) => {
-      queryClient.setQueryData<Post>(['post', id], (prev) => {
-        if (!prev) return {} as Post
-
-        return { ...prev, likes: prev.likes?.filter((l) => l.id !== like.id) }
-      })
-      setIsPostLiked(false)
-    },
   })
 
   useEffect(

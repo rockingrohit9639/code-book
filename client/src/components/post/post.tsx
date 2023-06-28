@@ -1,69 +1,33 @@
 import clsx from 'clsx'
 import { Link } from 'react-router-dom'
 import { AiFillHeart, AiOutlineComment, AiOutlineHeart, AiOutlineShareAlt } from 'react-icons/ai'
-import { useCallback, useEffect, useState } from 'react'
-import { useMutation, useQuery, useQueryClient } from 'react-query'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useQuery } from 'react-query'
 import Comments from '../comments/comments'
 import { Post as PostType } from '~/types/post'
 import { fetchFileById } from '~/queries/file'
-import { likePost, unlikePost } from '~/queries/post'
-import useError from '~/hooks/use-error'
 import { useUser } from '~/hooks/use-user'
 import SharePost from '../share-post'
+import { usePostsContext } from '~/hooks/use-posts'
 
 type PostProps = {
   className?: string
   style?: React.CSSProperties
-  post: PostType
+  postId: string
 }
 
-export default function Post({ className, style, post }: PostProps) {
+export default function Post({ className, style, postId }: PostProps) {
   const [commentVisible, setCommentVisible] = useState(false)
-  const { handleError } = useError()
-  const queryClient = useQueryClient()
   const { user } = useUser()
   const [isPostLiked, setIsPostLiked] = useState<boolean | undefined>()
+  const { posts, likePostMutation, unLikePostMutation } = usePostsContext()
 
-  const postImage = useQuery(['post-image', post.id], () => fetchFileById(post.imageId))
+  const post = useMemo(() => {
+    return posts?.find((_post) => _post.id === postId)
+  }, [postId, posts])
 
-  const likePostMutation = useMutation(likePost, {
-    onError: handleError,
-    onSuccess: (like) => {
-      queryClient.setQueryData<PostType[]>(['posts'], (prev) => {
-        if (!prev) return []
-
-        return prev.map((p) => {
-          if (p.id === post.id) {
-            return {
-              ...p,
-              likes: [...p.likes, like],
-            }
-          }
-          return p
-        })
-      })
-      setIsPostLiked(true)
-    },
-  })
-
-  const unLikePostMutation = useMutation(unlikePost, {
-    onError: handleError,
-    onSuccess: (like) => {
-      queryClient.setQueryData<PostType[]>(['posts'], (prev) => {
-        if (!prev) return []
-
-        return prev.map((p) => {
-          if (p.id === post.id) {
-            return {
-              ...p,
-              likes: p.likes.filter((l) => l.id !== like.id),
-            }
-          }
-          return p
-        })
-      })
-      setIsPostLiked(false)
-    },
+  const postImage = useQuery(['post-image', post?.id], () => fetchFileById(post?.imageId!), {
+    enabled: Boolean(post?.imageId),
   })
 
   useEffect(
@@ -74,12 +38,18 @@ export default function Post({ className, style, post }: PostProps) {
   )
 
   const handleLikeOrUnlike = useCallback(() => {
+    if (!post) return
+
     if (isPostLiked) {
       unLikePostMutation.mutate(post.id)
     } else {
       likePostMutation.mutate(post.id)
     }
   }, [isPostLiked, post, likePostMutation, unLikePostMutation])
+
+  if (!post) {
+    return <div className="h-96 w-full animate-pulse rounded-2xl bg-gray-300" />
+  }
 
   return (
     <div

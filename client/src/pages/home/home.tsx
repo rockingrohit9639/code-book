@@ -29,7 +29,7 @@ export default function Home() {
       return <Result status="500" title="Something went wrong while fetching posts" subTitle={getErrorMessage(error)} />
     }
 
-    return posts?.map((post) => <Post key={post.id} post={post} />)
+    return posts?.map((post) => <Post key={post.id} postId={post.id} />)
   }, [isLoading, error, getErrorMessage, posts])
 
   return (
