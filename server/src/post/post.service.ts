@@ -85,7 +85,7 @@ export class PostService {
       return post
     }
 
-    const [, postWithUpdatedViews] = await this.prismaService.$transaction([
+    const [, postWithUpdatedViews] = await Promise.all([
       this.prismaService.view.create({
         data: { userId: user.id, postId: id },
       }),

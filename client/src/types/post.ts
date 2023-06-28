@@ -32,6 +32,7 @@ export type Post = {
   createdById: string
   createdAt: string
   updatedAt: string
+  views: number
   likes: Like[]
   comments: Comment[]
 }

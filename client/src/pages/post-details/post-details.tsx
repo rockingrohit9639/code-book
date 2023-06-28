@@ -33,8 +33,10 @@ export default function PostDetails() {
   })
 
   useEffect(
-    function checkIsPostLiked() {
-      setIsPostLiked(post?.likes?.some((like) => like.likedById === user.id))
+    function checkPostLiked() {
+      if (!post) return
+
+      setIsPostLiked(post.likes.some((like) => like.likedById === user.id))
     },
     [post, user],
   )

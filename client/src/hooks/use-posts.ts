@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from 'react-query'
 import { useCallback, useEffect } from 'react'
 import constate from 'constate'
-import { fetchPosts, likePost, unlikePost } from '~/queries/post'
+import { fetchPosts, likePost, unlikePost, updateViews } from '~/queries/post'
 import { Comment, Like, Post } from '~/types/post'
 import { useSocketContext } from './use-socket'
 import useError from './use-error'
@@ -120,6 +120,22 @@ export function usePosts() {
     },
   })
 
+  const updateViewsMutation = useMutation(updateViews, {
+    onSuccess: (post) => {
+      queryClient.setQueryData<Post[]>(['posts'], (prev) => {
+        if (!prev) return []
+
+        return prev.map((_post) => {
+          if (_post.id === post.id) {
+            return { ..._post, views: _post.views + 1 }
+          }
+
+          return post
+        })
+      })
+    },
+  })
+
   useEffect(
     function listenToLikesOrDislikes() {
       /** Listening to new likes */
@@ -150,6 +166,7 @@ export function usePosts() {
     error,
     likePostMutation,
     unLikePostMutation,
+    updateViewsMutation,
   }
 }
 
