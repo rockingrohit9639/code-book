@@ -6,6 +6,10 @@ export function encrypt(text: string): string {
 }
 
 export function decrypt(text: string): string {
-  const bytes = Crypto.AES.decrypt(text, ENV.VITE_CRYPTO_KEY)
-  return JSON.parse(bytes.toString(Crypto.enc.Utf8))
+  try {
+    const bytes = Crypto.AES.decrypt(text, ENV.VITE_CRYPTO_KEY)
+    return JSON.parse(bytes.toString(Crypto.enc.Utf8))
+  } catch (error) {
+    return text
+  }
 }

@@ -31,6 +31,17 @@ export default function Chat({ className, style, conversationId }: ChatProps) {
   const messages = useQuery(['messages', conversationId], () => getConversationMessages(conversationId))
   const conversations = useQuery(['conversations'], getUserConversations)
 
+  const decryptedMessages = useMemo(() => {
+    if (!messages.data) {
+      return []
+    }
+
+    return messages.data.map((message) => ({
+      ...message,
+      content: decrypt(message.content),
+    }))
+  }, [messages.data])
+
   const conversation = useMemo(() => {
     if (!conversations?.data) {
       return null
@@ -82,27 +93,27 @@ export default function Chat({ className, style, conversationId }: ChatProps) {
 
   const handleNewMessage = useCallback(
     (message: Message) => {
-      const decryptedMessage = decrypt(message.content)
-      addNewMessage({ ...message, content: decryptedMessage })
+      if (message.fromId !== user.id) {
+        const decryptedMessage = decrypt(message.content)
+        addNewMessage({ ...message, content: decryptedMessage })
+      }
     },
-    [addNewMessage],
+    [addNewMessage, user.id],
   )
 
   const handleSendMessage = useCallback(
     (values: { content: string }) => {
       const encryptedMessage = encrypt(values.content)
-
       socket.emit('message', { content: encryptedMessage, conversation: conversationId, from: user.id })
 
       addNewMessage({
-        content: values.content,
+        content: encryptedMessage,
         from: user,
         fromId: user.id,
         id: Date.now().toString(),
       } as unknown as Message)
 
       handleScrollIntoView()
-
       form.resetFields()
     },
     [conversationId, user, form, addNewMessage, socket],
@@ -161,7 +172,7 @@ export default function Chat({ className, style, conversationId }: ChatProps) {
         <div className="text-sm text-gray-500">{typingUser ? `${typingUser.username} is typing...` : null}</div>
       </div>
       <div className="space-y-2 overflow-y-scroll p-4" style={{ height: 'calc(100vh - 160px)' }}>
-        {messages.data.map((message) => (
+        {decryptedMessages.map((message) => (
           <div
             key={message.id}
             className={clsx('flex items-end gap-1', message.fromId === user.id && 'flex-row-reverse')}
@@ -175,7 +186,7 @@ export default function Chat({ className, style, conversationId }: ChatProps) {
                 message.fromId === user.id ? 'bg-gray-500' : 'bg-primary',
               )}
             >
-              {decrypt(message.content)}
+              {message.content}
             </div>
           </div>
         ))}

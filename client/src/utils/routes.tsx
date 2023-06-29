@@ -1,4 +1,4 @@
-import { AiOutlineHome, AiOutlineMessage, AiOutlineNotification, AiOutlineSearch } from 'react-icons/ai'
+import { AiOutlineHome, AiOutlineMessage, AiOutlineNotification, AiOutlinePlus, AiOutlineSearch } from 'react-icons/ai'
 import NotificationsDrawer from '~/components/notifications-drawer/notifications-drawer'
 import SearchUsersDrawer from '~/components/search-users-drawer'
 
@@ -83,5 +83,13 @@ export const ROUTES: AppShellRoute[] = [
         }
       />
     ),
+  },
+  {
+    id: 'create-new-post',
+    item: 'Create New Post',
+    icon: <AiOutlinePlus />,
+    type: 'ROUTE',
+    path: '/create-new-post',
+    patterns: ['/create-new-post'],
   },
 ]
