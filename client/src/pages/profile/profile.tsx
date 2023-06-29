@@ -260,6 +260,7 @@ export default function Profile() {
           </div>
         </div>
       </div>
+
       <Tabs>
         <Tabs.TabPane
           tab={
@@ -276,15 +277,24 @@ export default function Profile() {
               : null}
           </div>
         </Tabs.TabPane>
-        <Tabs.TabPane
-          tab={
-            <div className="flex items-center space-x-2">
-              <BiBookmark />
-              <div>Saved</div>
+
+        {user.id === profile?.data?.id ? (
+          <Tabs.TabPane
+            tab={
+              <div className="flex items-center space-x-2">
+                <BiBookmark />
+                <div>Saved</div>
+              </div>
+            }
+            key="saved"
+          >
+            <div className="space-y-4">
+              {profile.data?.savedPosts && profile.data.savedPosts.length > 0
+                ? profile.data.savedPosts.map((post) => <Post key={post.id} incomingPost={post} />)
+                : null}
             </div>
-          }
-          key="saved"
-        />
+          </Tabs.TabPane>
+        ) : null}
       </Tabs>
     </div>
   )
