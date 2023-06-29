@@ -1,15 +1,15 @@
 import clsx from 'clsx'
 import { Link } from 'react-router-dom'
-import { AiFillHeart, AiOutlineComment, AiOutlineHeart, AiOutlineShareAlt } from 'react-icons/ai'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { AiOutlineComment, AiOutlineShareAlt } from 'react-icons/ai'
+import { useMemo, useState } from 'react'
 import { useQuery } from 'react-query'
 import Comments from '../comments/comments'
 import { fetchFileById } from '~/queries/file'
-import { useUser } from '~/hooks/use-user'
 import SharePost from '../share-post'
 import { usePostsContext } from '~/hooks/use-posts'
 import { Post as PostType } from '~/types/post'
 import SavePost from '../save-post'
+import LikePost from '../like-post'
 
 type PostProps = {
   className?: string
@@ -20,10 +20,8 @@ type PostProps = {
 
 export default function Post({ className, style, postId, incomingPost }: PostProps) {
   const [commentVisible, setCommentVisible] = useState(false)
-  const [isPostLiked, setIsPostLiked] = useState<boolean | undefined>()
 
-  const { user } = useUser()
-  const { posts, likePostMutation, unLikePostMutation } = usePostsContext()
+  const { posts } = usePostsContext()
 
   const post = useMemo(() => {
     if (incomingPost) {
@@ -36,23 +34,6 @@ export default function Post({ className, style, postId, incomingPost }: PostPro
   const postImage = useQuery(['post-image', post?.id], () => fetchFileById(post?.imageId!), {
     enabled: Boolean(post?.imageId),
   })
-
-  useEffect(
-    function checkIsPostLiked() {
-      setIsPostLiked(post?.likes?.some((like) => like.likedById === user.id))
-    },
-    [post, user],
-  )
-
-  const handleLikeOrUnlike = useCallback(() => {
-    if (!post) return
-
-    if (isPostLiked) {
-      unLikePostMutation.mutate(post.id)
-    } else {
-      likePostMutation.mutate(post.id)
-    }
-  }, [isPostLiked, post, likePostMutation, unLikePostMutation])
 
   if (!post) {
     return <div className="h-96 w-full animate-pulse rounded-2xl bg-gray-300" />
@@ -83,14 +64,7 @@ export default function Post({ className, style, postId, incomingPost }: PostPro
 
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-2">
-          <div className="cursor-pointer" onClick={handleLikeOrUnlike}>
-            {isPostLiked ? (
-              <AiFillHeart className="text-primary hover:text-primary/50 h-6 w-6" />
-            ) : (
-              <AiOutlineHeart className="h-6 w-6 hover:text-gray-500" />
-            )}
-          </div>
-
+          <LikePost post={post} />
           <div
             className="cursor-pointer"
             onClick={() => {

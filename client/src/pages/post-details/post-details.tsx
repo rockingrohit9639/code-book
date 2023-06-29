@@ -1,8 +1,8 @@
 import { Dropdown, Result, Tag, message } from 'antd'
 import { ItemType } from 'antd/es/menu/hooks/useItems'
 import dayjs from 'dayjs'
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import { AiFillHeart, AiOutlineCopy, AiOutlineDelete, AiOutlineHeart, AiOutlineShareAlt } from 'react-icons/ai'
+import { useMemo } from 'react'
+import { AiOutlineCopy, AiOutlineDelete, AiOutlineShareAlt } from 'react-icons/ai'
 import { HiOutlineDotsVertical } from 'react-icons/hi'
 import { useQuery } from 'react-query'
 import { Link, useNavigate, useParams } from 'react-router-dom'
@@ -16,13 +16,13 @@ import { usePostsContext } from '~/hooks/use-posts'
 import { useUser } from '~/hooks/use-user'
 import { fetchFileById } from '~/queries/file'
 import { getErrorMessage } from '~/utils/error'
+import LikePost from '~/components/like-post'
 
 export default function PostDetails() {
-  const [isPostLiked, setIsPostLiked] = useState<boolean | undefined>()
   const { user } = useUser()
   const { id } = useParams() as { id: string }
   const navigate = useNavigate()
-  const { posts, isLoading, error, likePostMutation, unLikePostMutation } = usePostsContext()
+  const { posts, isLoading, error } = usePostsContext()
 
   const post = useMemo(() => {
     return posts?.find((p) => p.id === id)
@@ -31,23 +31,6 @@ export default function PostDetails() {
   const postImage = useQuery(['post-image', id], () => fetchFileById(post?.imageId!), {
     enabled: Boolean(post?.imageId),
   })
-
-  useEffect(
-    function checkPostLiked() {
-      if (!post) return
-
-      setIsPostLiked(post.likes.some((like) => like.likedById === user.id))
-    },
-    [post, user],
-  )
-
-  const handleLikeOrUnlike = useCallback(() => {
-    if (isPostLiked) {
-      unLikePostMutation.mutate(id)
-    } else {
-      likePostMutation.mutate(id)
-    }
-  }, [isPostLiked, likePostMutation, unLikePostMutation, id])
 
   const dropdownItems = useMemo(() => {
     const items: ItemType[] = [
@@ -127,13 +110,7 @@ export default function PostDetails() {
       <div className="rounded-lg bg-white shadow-sm">
         <div className="space-y-2 p-4">
           <div className="flex items-center space-x-4">
-            <div className="cursor-pointer" onClick={handleLikeOrUnlike}>
-              {isPostLiked ? (
-                <AiFillHeart className="h-6 w-6 text-red-500 hover:text-red-300" />
-              ) : (
-                <AiOutlineHeart className="h-6 w-6 hover:text-gray-500" />
-              )}
-            </div>
+            {post ? <LikePost post={post} /> : null}
 
             <SharePost
               title={post?.title ?? ''}
