@@ -33,10 +33,11 @@ export type Post = {
   createdAt: string
   updatedAt: string
   views: number
+  tags: string[]
   likes: Like[]
   comments: Comment[]
 }
 
-export type CreatePostDto = Pick<Post, 'title' | 'codeSnippet'> & {
+export type CreatePostDto = Pick<Post, 'title' | 'codeSnippet' | 'tags'> & {
   imageBase64: string
 }

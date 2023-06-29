@@ -11,6 +11,7 @@ import { CODEMIRROR_LANGUAGES, CODEMIRROR_THEMES, EDITOR_SETTINGS } from '~/util
 import { CreatePostDto } from '~/types/post'
 import { componentToImage } from '~/utils/post'
 import { createPost } from '~/queries/post'
+import TagsSelector from '~/components/tags-selector'
 
 export default function CreateNewPost() {
   const editorRef = useRef<HTMLDivElement>(null)
@@ -42,7 +43,7 @@ export default function CreateNewPost() {
       <div className="mb-4 border-b pb-4 text-2xl font-bold">Create new post</div>
 
       <Form
-        className="space-y-4"
+        className="grid grid-cols-2 gap-2"
         layout="vertical"
         form={form}
         initialValues={EDITOR_SETTINGS}
@@ -50,6 +51,7 @@ export default function CreateNewPost() {
           const dataToSubmit = {
             title: values.title,
             codeSnippet: values.codeSnippet,
+            tags: values.tags,
           }
 
           handleCreatePost(dataToSubmit)
@@ -57,14 +59,14 @@ export default function CreateNewPost() {
       >
         <Form.Item
           name="title"
-          className="mb-0 rounded-md bg-white p-4 shadow"
+          className="col-span-full rounded-md bg-white px-4 py-8 shadow"
           label="Title"
           rules={[{ required: true, message: 'Title is required!' }]}
         >
           <Input placeholder="Title" />
         </Form.Item>
 
-        <EditorOptions form={form} className="rounded-md bg-white p-4 shadow" />
+        <EditorOptions form={form} className="col-span-full rounded-md bg-white p-4 shadow" />
 
         <Form.Item shouldUpdate noStyle>
           {({ getFieldValue, setFieldValue }) => {
@@ -89,7 +91,7 @@ export default function CreateNewPost() {
             }
 
             return (
-              <Form.Item name="codeSnippet" className="bg-white">
+              <Form.Item name="codeSnippet" className="col-span-full bg-white">
                 <div className="flex items-center justify-center rounded-md border-2 p-4">
                   <div
                     ref={editorRef}
@@ -120,15 +122,26 @@ export default function CreateNewPost() {
           }}
         </Form.Item>
 
-        <Button
-          type="primary"
-          htmlType="submit"
-          icon={<PlusOutlined />}
-          loading={createPostMutation.isLoading}
-          disabled={createPostMutation.isLoading}
+        <Form.Item
+          className="rounded-md bg-white px-4 py-8 shadow"
+          name="tags"
+          label="Tags"
+          rules={[{ required: true, message: 'Please select at least one tag for you post be categorized!' }]}
         >
-          Create Post
-        </Button>
+          <TagsSelector placeholder="Select tags for your post" mode="multiple" />
+        </Form.Item>
+
+        <div className="col-span-full">
+          <Button
+            type="primary"
+            htmlType="submit"
+            icon={<PlusOutlined />}
+            loading={createPostMutation.isLoading}
+            disabled={createPostMutation.isLoading}
+          >
+            Create Post
+          </Button>
+        </div>
       </Form>
     </Page>
   )

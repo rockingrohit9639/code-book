@@ -13,6 +13,9 @@ export class CreatePostDto {
   /** base64 string containing the image */
   @IsString()
   imageBase64: string
+
+  @IsString({ each: true })
+  tags: string[]
 }
 
 export class UpdatePostDto extends PartialType(PickType(CreatePostDto, ['title'])) {}

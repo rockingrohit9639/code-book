@@ -40,6 +40,7 @@ export class PostService {
       data: {
         title: dto.title,
         codeSnippet: dto.codeSnippet,
+        tags: dto.tags,
         image: { connect: { id: imageCreated.id } },
         createdBy: { connect: { id: user.id } },
       },

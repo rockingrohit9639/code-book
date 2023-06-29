@@ -80,7 +80,8 @@ model Post {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  views Int @default(0)
+  views Int      @default(0)
+  tags  String[]
 
   likes         Like[]
   comments      Comment[]
