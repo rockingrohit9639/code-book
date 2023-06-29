@@ -30,4 +30,6 @@ export const USER_SELECT_FIELDS = {
   conversationIds: true,
   tags: true,
   posts: { include: { createdBy: { select: BASIC_USER_SELECT_FIELDS } } },
+  savedPostIds: true,
+  savedPosts: { include: { createdBy: { select: BASIC_USER_SELECT_FIELDS } } },
 } satisfies Prisma.UserSelect

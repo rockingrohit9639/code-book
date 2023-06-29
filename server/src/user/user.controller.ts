@@ -43,6 +43,14 @@ export class UserController {
     return this.userService.updateUserProfile(id, dto, user)
   }
 
+  @Post('save-post/:postId')
+  savePost(
+    @Param('postId') postId: string,
+    @GetUser() user: UserWithoutSensitiveData,
+  ): Promise<UserWithoutSensitiveData & { status: 'SAVED' | 'REMOVED' }> {
+    return this.userService.savePost(postId, user)
+  }
+
   /** Followers and Followings */
   @Post('follow/:userId')
   follow(

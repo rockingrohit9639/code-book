@@ -15,12 +15,14 @@ import { BASIC_USER_SELECT_FIELDS, USER_SELECT_FIELDS } from './user.fields'
 import { SearchUserDto, UpdateUserProfileDto } from './user.dto'
 import { POST_INCLUDE_FIELDS } from '~/post/post.fields'
 import { NotificationService } from '~/notification/notification.service'
+import { PostService } from '~/post/post.service'
 
 @Injectable()
 export class UserService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly notificationService: NotificationService,
+    private readonly postsService: PostService,
   ) {}
 
   searchUsers(dto: SearchUserDto, user: UserWithoutSensitiveData): Promise<UserWithoutSensitiveData[]> {
@@ -173,6 +175,38 @@ export class UserService {
       return true
     }
     return false
+  }
+
+  async savePost(
+    postId: string,
+    user: UserWithoutSensitiveData,
+  ): Promise<UserWithoutSensitiveData & { status: 'SAVED' | 'REMOVED' }> {
+    const post = await this.postsService.findOneById(postId)
+
+    const isPostSaved = await this.prismaService.user.findFirst({
+      where: { savedPosts: { some: { id: post.id } } },
+      select: { id: true },
+    })
+
+    if (isPostSaved) {
+      return {
+        ...(await this.prismaService.user.update({
+          where: { id: user.id },
+          data: { savedPosts: { disconnect: { id: post.id } } },
+          select: USER_SELECT_FIELDS,
+        })),
+        status: 'REMOVED',
+      }
+    }
+
+    return {
+      ...(await this.prismaService.user.update({
+        where: { id: user.id },
+        data: { savedPosts: { connect: { id: post.id } } },
+        select: USER_SELECT_FIELDS,
+      })),
+      status: 'SAVED',
+    }
   }
 
   /** Followers and Followings */

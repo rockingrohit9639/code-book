@@ -26,6 +26,8 @@ export type User = {
   followingIds: string[]
   posts: Post[]
   postIds: string[]
+  savedPosts: Post[]
+  savedPostIds: string[]
 }
 
 export type UpdateProfileDto = Partial<

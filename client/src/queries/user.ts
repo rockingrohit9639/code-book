@@ -35,3 +35,10 @@ export async function searchUsers(query: string) {
   const { data } = await apiClient.get<UserWithoutSensitiveData[]>('/user/search', { params: { query } })
   return data
 }
+
+export async function savePost(postId: string) {
+  const { data } = await apiClient.post<UserWithoutSensitiveData & { status: 'SAVED' | 'REMOVED' }>(
+    `/user/save-post/${postId}`,
+  )
+  return data
+}

@@ -9,6 +9,7 @@ import { useUser } from '~/hooks/use-user'
 import SharePost from '../share-post'
 import { usePostsContext } from '~/hooks/use-posts'
 import { Post as PostType } from '~/types/post'
+import SavePost from '../save-post'
 
 type PostProps = {
   className?: string
@@ -19,8 +20,9 @@ type PostProps = {
 
 export default function Post({ className, style, postId, incomingPost }: PostProps) {
   const [commentVisible, setCommentVisible] = useState(false)
-  const { user } = useUser()
   const [isPostLiked, setIsPostLiked] = useState<boolean | undefined>()
+
+  const { user } = useUser()
   const { posts, likePostMutation, unLikePostMutation } = usePostsContext()
 
   const post = useMemo(() => {
@@ -79,33 +81,36 @@ export default function Post({ className, style, postId, incomingPost }: PostPro
         )}
       </div>
 
-      <div className="flex items-center space-x-4">
-        <div className="cursor-pointer" onClick={handleLikeOrUnlike}>
-          {isPostLiked ? (
-            <AiFillHeart className="h-6 w-6 text-red-500 hover:text-red-300" />
-          ) : (
-            <AiOutlineHeart className="h-6 w-6 hover:text-gray-500" />
-          )}
-        </div>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-2">
+          <div className="cursor-pointer" onClick={handleLikeOrUnlike}>
+            {isPostLiked ? (
+              <AiFillHeart className="text-primary hover:text-primary/50 h-6 w-6" />
+            ) : (
+              <AiOutlineHeart className="h-6 w-6 hover:text-gray-500" />
+            )}
+          </div>
 
-        <div
-          className="cursor-pointer"
-          onClick={() => {
-            setCommentVisible((prev) => !prev)
-          }}
-        >
-          <AiOutlineComment className="h-6 w-6 hover:text-gray-500" />
-        </div>
+          <div
+            className="cursor-pointer"
+            onClick={() => {
+              setCommentVisible((prev) => !prev)
+            }}
+          >
+            <AiOutlineComment className="h-6 w-6 hover:text-gray-500" />
+          </div>
 
-        <SharePost
-          title={post.title}
-          postId={post.id}
-          trigger={
-            <div className="cursor-pointer">
-              <AiOutlineShareAlt className="h-6 w-6 hover:text-gray-500" />
-            </div>
-          }
-        />
+          <SharePost
+            title={post.title}
+            postId={post.id}
+            trigger={
+              <div className="cursor-pointer">
+                <AiOutlineShareAlt className="h-6 w-6 hover:text-gray-500" />
+              </div>
+            }
+          />
+        </div>
+        <SavePost postId={post.id} />
       </div>
 
       <div className="flex items-center space-x-4">

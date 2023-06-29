@@ -56,6 +56,8 @@ model User {
   sentMessages         Message[]      @relation(name: "SentMessages")
   receivedMessages     Message[]      @relation(name: "ReceivedMessages")
   postsViewed          View[]
+  savedPosts           Post[]         @relation(name: "SavedPosts", fields: [savedPostIds], references: [id])
+  savedPostIds         String[]       @db.ObjectId
 }
 
 model File {
@@ -88,6 +90,9 @@ model Post {
   comments      Comment[]
   notifications Notification[]
   viewdByUsers  View[]
+
+  savedBy    User[]   @relation(name: "SavedPosts", fields: [savedByIds], references: [id])
+  savedByIds String[] @db.ObjectId
 }
 
 model Like {
