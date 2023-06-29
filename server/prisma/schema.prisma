@@ -173,3 +173,10 @@ model View {
   viewedBy User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId   String @db.ObjectId
 }
+
+model Tag {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  tag       String   @unique
+}

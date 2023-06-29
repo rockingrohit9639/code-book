@@ -18,7 +18,9 @@ export default function AppShell({ children }: AppShellProps) {
     <Layout className="h-screen overflow-hidden">
       <Sidebar />
       <Layout>
-        <Content style={{ background: colorBgContainer }}>{children}</Content>
+        <Content style={{ background: colorBgContainer }} className="overflow-y-auto">
+          {children}
+        </Content>
       </Layout>
     </Layout>
   )

@@ -12,6 +12,7 @@ import { NotificationModule } from './notification/notification.module'
 import { SocketModule } from './socket/socket.module'
 import { ConversationModule } from './conversation/conversation.module'
 import { MessageModule } from './message/message.module'
+import { TagModule } from './tag/tag.module'
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { MessageModule } from './message/message.module'
     SocketModule,
     ConversationModule,
     MessageModule,
+    TagModule,
   ],
   controllers: [],
   providers: [PrismaService],
