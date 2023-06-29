@@ -1,9 +1,9 @@
 import { Button, Form, Input } from 'antd'
 import { SendOutlined } from '@ant-design/icons'
-import { QueryClient, useMutation, useQueryClient } from 'react-query'
+import { useMutation, useQueryClient } from 'react-query'
 import { useMemo } from 'react'
 import { orderBy } from 'lodash'
-import { Comment as CommentType } from '~/types/post'
+import { Comment as CommentType, Post } from '~/types/post'
 import useError from '~/hooks/use-error'
 import { addComment } from '~/queries/post'
 import Comment from './components/comment'
@@ -13,10 +13,9 @@ type CommentsProps = {
   style?: React.CSSProperties
   postId: string
   comments: CommentType[]
-  onCommentSuccess?: (comment: CommentType, queryClient: QueryClient) => void
 }
 
-export default function Comments({ className, style, comments, postId, onCommentSuccess }: CommentsProps) {
+export default function Comments({ className, style, comments, postId }: CommentsProps) {
   const [form] = Form.useForm()
   const { handleError } = useError()
   const queryClient = useQueryClient()
@@ -24,9 +23,17 @@ export default function Comments({ className, style, comments, postId, onComment
   const addCommentMutation = useMutation((comment: string) => addComment(postId, comment), {
     onError: handleError,
     onSuccess: (comment) => {
-      if (typeof onCommentSuccess === 'function') {
-        onCommentSuccess(comment, queryClient)
-      }
+      queryClient.setQueryData<Post[]>(['posts'], (prev) => {
+        if (!prev) return []
+
+        return prev.map((_post) => {
+          if (_post.id === postId) {
+            return { ..._post, comments: [comment, ..._post.comments] }
+          }
+
+          return _post
+        })
+      })
       form.resetFields()
     },
   })

@@ -4,7 +4,6 @@ import { AiFillHeart, AiOutlineComment, AiOutlineHeart, AiOutlineShareAlt } from
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useQuery } from 'react-query'
 import Comments from '../comments/comments'
-import { Post as PostType } from '~/types/post'
 import { fetchFileById } from '~/queries/file'
 import { useUser } from '~/hooks/use-user'
 import SharePost from '../share-post'
@@ -108,27 +107,7 @@ export default function Post({ className, style, postId }: PostProps) {
         <div className="text-sm">{post.comments?.length ?? 0} comments</div>
       </div>
 
-      {commentVisible ? (
-        <Comments
-          className="border-t-2 pt-2"
-          postId={post.id}
-          comments={post.comments}
-          onCommentSuccess={(comment, queryClient) => {
-            queryClient.setQueryData<PostType[]>(['posts'], (prev) => {
-              if (!prev) return []
-              return prev.map((p) => {
-                if (p.id === post.id) {
-                  return {
-                    ...p,
-                    comments: [comment, ...p.comments],
-                  }
-                }
-                return p
-              })
-            })
-          }}
-        />
-      ) : null}
+      {commentVisible ? <Comments className="border-t-2 pt-2" postId={post.id} comments={post.comments} /> : null}
     </div>
   )
 }

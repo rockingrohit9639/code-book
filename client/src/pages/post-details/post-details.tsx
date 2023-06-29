@@ -14,7 +14,6 @@ import SharePost from '~/components/share-post'
 import { usePostsContext } from '~/hooks/use-posts'
 import { useUser } from '~/hooks/use-user'
 import { fetchFileById } from '~/queries/file'
-import { Post } from '~/types/post'
 import { getErrorMessage } from '~/utils/error'
 
 export default function PostDetails() {
@@ -144,18 +143,7 @@ export default function PostDetails() {
           </div>
         </div>
 
-        <Comments
-          className="p-4"
-          postId={id}
-          comments={post?.comments ?? []}
-          onCommentSuccess={(comment, queryClient) => {
-            queryClient.setQueryData<Post>(['post', id], (prev) => {
-              if (!prev) return {} as Post
-
-              return { ...prev, comments: [comment, ...prev.comments] }
-            })
-          }}
-        />
+        <Comments className="p-4" postId={id} comments={post?.comments ?? []} />
       </div>
     </Page>
   )
