@@ -41,6 +41,7 @@
     "lodash": "^4.17.21",
     "moment": "^2.29.4",
     "postcss": "^8.4.21",
+    "randomcolor": "^0.6.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^4.8.0",
@@ -55,6 +56,7 @@
   "devDependencies": {
     "@types/crypto-js": "^4.1.1",
     "@types/lodash": "^4.14.194",
+    "@types/randomcolor": "^0.5.7",
     "@types/react": "^18.0.28",
     "@types/react-dom": "^18.0.11",
     "@vitejs/plugin-react": "^3.1.0",

@@ -1,4 +1,4 @@
-import { Dropdown, Result, message } from 'antd'
+import { Dropdown, Result, Tag, message } from 'antd'
 import { ItemType } from 'antd/es/menu/hooks/useItems'
 import dayjs from 'dayjs'
 import { useCallback, useEffect, useMemo, useState } from 'react'
@@ -6,6 +6,7 @@ import { AiFillHeart, AiOutlineCopy, AiOutlineDelete, AiOutlineHeart, AiOutlineS
 import { HiOutlineDotsVertical } from 'react-icons/hi'
 import { useQuery } from 'react-query'
 import { Link, useNavigate, useParams } from 'react-router-dom'
+import randomColor from 'randomcolor'
 import Comments from '~/components/comments'
 import DeletePostModal from '~/components/delete-post-modal'
 import Loading from '~/components/loading'
@@ -106,6 +107,14 @@ export default function PostDetails() {
             <HiOutlineDotsVertical className="cursor-pointer" />
           </Dropdown>
         </div>
+      </div>
+
+      <div className="rounded-lg bg-white p-4 shadow-sm">
+        {post?.tags.map((tag) => (
+          <Tag key={tag} color={randomColor()}>
+            {tag}
+          </Tag>
+        ))}
       </div>
 
       {postImage.data ? (
