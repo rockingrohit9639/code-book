@@ -6,6 +6,7 @@ import { useMutation, useQuery, useQueryClient } from 'react-query'
 import useError from '~/hooks/use-error'
 import { fetchProfile, updateProfile } from '~/queries/user'
 import { UpdateProfileDto } from '~/types/user'
+import TagsSelector from '../tags-selector'
 
 type UpdateProfileModalProps = {
   className?: string
@@ -65,6 +66,7 @@ export default function UpdateProfileModal({ className, style, trigger, profileU
             github: profile.data?.github,
             linkedin: profile.data?.linkedin,
             bio: profile.data?.bio,
+            tags: profile.data?.tags,
           }}
         >
           <Form.Item
@@ -112,6 +114,14 @@ export default function UpdateProfileModal({ className, style, trigger, profileU
 
           <Form.Item name="linkedin" label="LinkedIn" rules={[{ type: 'url', message: 'Invalid URL' }]}>
             <Input prefix={<AiOutlineLinkedin />} placeholder="https://example.com" />
+          </Form.Item>
+
+          <Form.Item
+            name="tags"
+            label="Profile Tags"
+            rules={[{ required: true, message: 'Please select at least one tag to categorize yourselft!' }]}
+          >
+            <TagsSelector placeholder="Select Tags" mode="multiple" />
           </Form.Item>
 
           <Form.Item name="bio" label="Bio" className="col-span-2">

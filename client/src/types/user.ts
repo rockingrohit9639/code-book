@@ -17,6 +17,7 @@ export type User = {
   linkedin?: string
   password: string
   salt: string
+  tags?: string[]
   createdAt: string
   updatedAt: string
   followers: User[]

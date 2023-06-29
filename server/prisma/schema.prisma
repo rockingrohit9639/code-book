@@ -27,6 +27,7 @@ model User {
   username  String    @unique
   bio       String?
   dob       DateTime?
+  tags      String[]  @default([])
 
   website  String?
   github   String?
@@ -81,7 +82,7 @@ model Post {
   updatedAt   DateTime @updatedAt
 
   views Int      @default(0)
-  tags  String[]
+  tags  String[] @default([])
 
   likes         Like[]
   comments      Comment[]

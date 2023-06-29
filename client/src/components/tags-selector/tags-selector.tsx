@@ -39,10 +39,10 @@ export default function TagsSelector(props: TagsSelectorProps) {
             <Divider className="my-4" />
             <Form form={form} className="flex gap-x-2 p-2" onFinish={createTagMutation.mutate}>
               <Form.Item name="tag" className="mb-0 flex-1">
-                <Input placeholder="Please enter item" />
+                <Input placeholder="Please enter a new tag" />
               </Form.Item>
               <Button type="text" icon={<PlusOutlined />} htmlType="submit">
-                Add item
+                Add Tag
               </Button>
             </Form>
           </React.Fragment>

@@ -1,4 +1,4 @@
-import { Button, Result, Tabs } from 'antd'
+import { Button, Result, Tabs, Tag } from 'antd'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
 import { Link, useParams } from 'react-router-dom'
 import { AiOutlineGlobal, AiOutlineGithub, AiOutlineLinkedin } from 'react-icons/ai'
@@ -6,8 +6,8 @@ import { EditOutlined, MessageOutlined, UserAddOutlined, UserDeleteOutlined } fr
 import { BiBookmark, BiGridAlt } from 'react-icons/bi'
 import { useCallback, useMemo } from 'react'
 import invariant from 'tiny-invariant'
+import randomColor from 'randomcolor'
 import Loading from '~/components/loading'
-import Page from '~/components/page'
 import { fetchProfile, follow, removeFollower, unfollow } from '~/queries/user'
 import { getErrorMessage } from '~/utils/error'
 import UpdateProfileModal from '~/components/update-profile-modal'
@@ -159,13 +159,23 @@ export default function Profile() {
   }
 
   return (
-    <Page className="space-y-4 p-4">
+    <div className="space-y-4 p-4">
       <div className="grid grid-cols-6 items-center gap-8">
         <img src="/code.png" className="col-span-2 h-60 w-60 rounded-full object-cover" />
 
-        <div className="col-span-3 space-y-4">
+        <div className="col-span-4 space-y-4">
           <div>
-            <div className="font-bold">@{profile.data?.username}</div>
+            <div className="flex items-center space-x-2">
+              <div className="font-bold">@{profile.data?.username}</div>
+              <div>
+                {profile.data?.id === user.id ? (
+                  <UpdateProfileModal
+                    profileUsername={profile.data?.username!}
+                    trigger={<Button type="text" ghost icon={<EditOutlined />} />}
+                  />
+                ) : null}
+              </div>
+            </div>
             <div>
               {profile.data?.firstName} {profile.data?.lastName}
             </div>
@@ -205,6 +215,14 @@ export default function Profile() {
             ) : null}
           </div>
 
+          <div>
+            {profile.data?.tags?.map((tag) => (
+              <Tag key={tag} color={randomColor()}>
+                {tag}
+              </Tag>
+            ))}
+          </div>
+
           <div className="flex items-center space-x-2">
             {profile.data?.followerIds.includes(user.id) ? (
               <CreateConversation
@@ -241,19 +259,6 @@ export default function Profile() {
             ) : null}
           </div>
         </div>
-
-        <div className="col-span-1 self-start">
-          {profile.data?.id === user.id ? (
-            <UpdateProfileModal
-              profileUsername={profile.data?.username!}
-              trigger={
-                <Button type="primary" ghost icon={<EditOutlined />}>
-                  Update Profile
-                </Button>
-              }
-            />
-          ) : null}
-        </div>
       </div>
       <Tabs>
         <Tabs.TabPane
@@ -267,7 +272,7 @@ export default function Profile() {
         >
           <div className="space-y-4">
             {profile.data?.posts && profile.data.posts.length > 0
-              ? profile.data.posts.map((post) => <Post key={post.id} post={post} />)
+              ? profile.data.posts.map((post) => <Post key={post.id} incomingPost={post} />)
               : null}
           </div>
         </Tabs.TabPane>
@@ -281,6 +286,6 @@ export default function Profile() {
           key="saved"
         />
       </Tabs>
-    </Page>
+    </div>
   )
 }

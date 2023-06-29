@@ -1,5 +1,12 @@
 import { Prisma } from '@prisma/client'
 
+export const BASIC_USER_SELECT_FIELDS = {
+  id: true,
+  username: true,
+  firstName: true,
+  lastName: true,
+} satisfies Prisma.UserSelect
+
 export const USER_SELECT_FIELDS = {
   id: true,
   email: true,
@@ -21,11 +28,6 @@ export const USER_SELECT_FIELDS = {
   followingIds: true,
   toNotificationIds: true,
   conversationIds: true,
-} satisfies Prisma.UserSelect
-
-export const BASIC_USER_SELECT_FIELDS = {
-  id: true,
-  username: true,
-  firstName: true,
-  lastName: true,
+  tags: true,
+  posts: { include: { createdBy: { select: BASIC_USER_SELECT_FIELDS } } },
 } satisfies Prisma.UserSelect

@@ -8,22 +8,28 @@ import { fetchFileById } from '~/queries/file'
 import { useUser } from '~/hooks/use-user'
 import SharePost from '../share-post'
 import { usePostsContext } from '~/hooks/use-posts'
+import { Post as PostType } from '~/types/post'
 
 type PostProps = {
   className?: string
   style?: React.CSSProperties
-  postId: string
+  postId?: string
+  incomingPost: PostType
 }
 
-export default function Post({ className, style, postId }: PostProps) {
+export default function Post({ className, style, postId, incomingPost }: PostProps) {
   const [commentVisible, setCommentVisible] = useState(false)
   const { user } = useUser()
   const [isPostLiked, setIsPostLiked] = useState<boolean | undefined>()
   const { posts, likePostMutation, unLikePostMutation } = usePostsContext()
 
   const post = useMemo(() => {
+    if (incomingPost) {
+      return incomingPost
+    }
+
     return posts?.find((_post) => _post.id === postId)
-  }, [postId, posts])
+  }, [postId, posts, incomingPost])
 
   const postImage = useQuery(['post-image', post?.id], () => fetchFileById(post?.imageId!), {
     enabled: Boolean(post?.imageId),

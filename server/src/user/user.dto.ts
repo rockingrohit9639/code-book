@@ -59,6 +59,9 @@ export class UpdateUserProfileDto {
   @IsOptional()
   @IsUrl()
   linkedin?: string
+
+  @IsString({ each: true })
+  tags: string[]
 }
 
 export class SearchUserDto {
