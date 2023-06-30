@@ -8,14 +8,16 @@ import {
 import { Prisma, User } from '@prisma/client'
 import * as bcrypt from 'bcrypt'
 import { omit } from 'lodash'
+import { ConfigService } from '@nestjs/config'
 import { PrismaService } from '~/prisma/prisma.service'
 import { BasicUser, UserWithoutSensitiveData } from './user.type'
-import { SignupDto } from '~/auth/auth.dto'
+import { CreateGoogleUserDto, SignupDto } from '~/auth/auth.dto'
 import { BASIC_USER_SELECT_FIELDS, USER_SELECT_FIELDS } from './user.fields'
 import { SearchUserDto, UpdateUserProfileDto } from './user.dto'
 import { POST_INCLUDE_FIELDS } from '~/post/post.fields'
 import { NotificationService } from '~/notification/notification.service'
 import { PostService } from '~/post/post.service'
+import { EnvironmentVars } from '~/config/config.options'
 
 @Injectable()
 export class UserService {
@@ -23,6 +25,7 @@ export class UserService {
     private readonly prismaService: PrismaService,
     private readonly notificationService: NotificationService,
     private readonly postsService: PostService,
+    private readonly configService: ConfigService<EnvironmentVars>,
   ) {}
 
   searchUsers(dto: SearchUserDto, user: UserWithoutSensitiveData): Promise<UserWithoutSensitiveData[]> {
@@ -93,6 +96,11 @@ export class UserService {
     }
 
     const { password: userPassword, salt } = user
+
+    if (!userPassword || !salt) {
+      throw new UnauthorizedException('Invalid Credentials')
+    }
+
     const hashedPassword = await bcrypt.hash(password, salt)
     if (userPassword !== hashedPassword) {
       throw new UnauthorizedException('Invalid Credentials')
@@ -138,6 +146,25 @@ export class UserService {
       data,
       select: USER_SELECT_FIELDS,
     })
+  }
+
+  async findOrCreateGoogleUser(username: string, payload: CreateGoogleUserDto): Promise<UserWithoutSensitiveData> {
+    let user = await this.prismaService.user.findFirst({ where: { username }, select: USER_SELECT_FIELDS })
+
+    if (!user) {
+      user = await this.prismaService.user.create({
+        data: {
+          username,
+          email: payload.email,
+          firstName: payload.given_name,
+          lastName: payload.family_name,
+          picture: payload.picture,
+        },
+        select: USER_SELECT_FIELDS,
+      })
+    }
+
+    return user
   }
 
   async updateUserProfile(

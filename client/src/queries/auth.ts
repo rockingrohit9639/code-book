@@ -1,4 +1,4 @@
-import { LoginDto, SignupDto } from '../types/auth'
+import { LoginDto, LoginWithGoogleDto, SignupDto } from '../types/auth'
 import { UserWithoutSensitiveData } from '../types/user'
 import { apiClient } from '../utils/client'
 
@@ -19,5 +19,13 @@ export async function isEmailExists(email: string) {
 
 export async function login(dto: LoginDto) {
   const { data } = await apiClient.post<{ user: UserWithoutSensitiveData; token: string }>('/auth/login', dto)
+  return data
+}
+
+export async function loginWithGoogle(dto: LoginWithGoogleDto) {
+  const { data } = await apiClient.post<{ user: UserWithoutSensitiveData; token: string }>(
+    '/auth/login-with-google',
+    dto,
+  )
   return data
 }

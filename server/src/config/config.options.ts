@@ -10,6 +10,9 @@ const validationSchema = joi
     JWT_EXPIRATION: joi.string().required(),
     UPLOAD_DIR: joi.string().required(),
     MULTER_MAX_FILE_SIZE: joi.number().default(DEFAULT_MULTER_MAX_FILE_SIZE),
+    GOOGLE_CLIENT_ID: joi.string().required(),
+    GOOGLE_CLIENT_SECRET: joi.string().required(),
+    GOOGLE_CALLBACK_URI: joi.string().uri().required(),
   })
   .required()
 

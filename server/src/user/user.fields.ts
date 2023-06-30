@@ -32,4 +32,5 @@ export const USER_SELECT_FIELDS = {
   posts: { include: { createdBy: { select: BASIC_USER_SELECT_FIELDS } } },
   savedPostIds: true,
   savedPosts: { include: { createdBy: { select: BASIC_USER_SELECT_FIELDS } } },
+  picture: true,
 } satisfies Prisma.UserSelect

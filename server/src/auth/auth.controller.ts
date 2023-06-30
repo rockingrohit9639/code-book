@@ -1,11 +1,17 @@
 import { Body, Controller, Get, Post, Query } from '@nestjs/common'
 import { AuthService } from './auth.service'
-import { LoginDto, SignupDto } from './auth.dto'
+import { LoginDto, LoginWithGoogleDto, SignupDto } from './auth.dto'
 import { UserWithoutSensitiveData } from '~/user/user.type'
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
+
+  // : Promise<{ user: UserWithoutSensitiveData; token: string }>
+  @Post('login-with-google')
+  async loginWithGoogle(@Body() dto: LoginWithGoogleDto) {
+    return this.authService.loginWithGoogle(dto)
+  }
 
   @Post('login')
   async login(@Body() loginDto: LoginDto): Promise<{ user: UserWithoutSensitiveData; token: string }> {

@@ -10,6 +10,7 @@
     "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "./",
+    "lib": ["ES2021"],
     "paths": {
       "~/*": ["./src/*"]
     },

@@ -1,6 +1,7 @@
 import { Button, Form, Input } from 'antd'
 import { Link, Navigate, useSearchParams } from 'react-router-dom'
 import { useAuthContext } from '../../hooks/use-auth'
+import LoginWithGoogle from '~/components/login-with-google'
 
 export default function Login() {
   const { user, loginMutation } = useAuthContext()
@@ -21,15 +22,14 @@ export default function Login() {
       }}
     >
       <div className="absolute inset-0 bg-white/10 backdrop-blur-lg" />
-      <div className="relative z-10 w-full max-w-md rounded-md bg-white p-8 shadow">
-        <div className="mb-8 text-center">
+      <div className="relative z-10 w-full max-w-md space-y-4 rounded-md bg-white p-8 shadow">
+        <div className="text-center">
           <div className="text-lg font-semibold">Login</div>
           <div className="text-primary text-xs font-medium">Welcome Back</div>
         </div>
 
         <Form
           layout="vertical"
-          className="mb-4"
           onFinish={(values) => {
             loginMutation.mutate(values)
           }}
@@ -57,7 +57,9 @@ export default function Login() {
           </Button>
         </Form>
 
-        <Link to="/signup">
+        <LoginWithGoogle />
+
+        <Link to="/signup" className="block">
           <Button block>Did not have an account ?</Button>
         </Link>
       </div>

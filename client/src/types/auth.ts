@@ -11,3 +11,7 @@ export type LoginDto = {
   usernameOrEmail: string
   password: string
 }
+
+export type LoginWithGoogleDto = {
+  accessToken: string
+}

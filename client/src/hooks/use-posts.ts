@@ -5,9 +5,13 @@ import { fetchPosts, likePost, unlikePost, updateViews } from '~/queries/post'
 import { Comment, Like, Post } from '~/types/post'
 import { useSocketContext } from './use-socket'
 import useError from './use-error'
+import { useAuthContext } from './use-auth'
 
 export function usePosts() {
-  const { data, isLoading, error } = useQuery(['posts'], fetchPosts)
+  const { user } = useAuthContext()
+  const { data, isLoading, error } = useQuery(['posts'], fetchPosts, {
+    enabled: !!user,
+  })
   const { socket } = useSocketContext()
   const queryClient = useQueryClient()
   const { handleError } = useError()

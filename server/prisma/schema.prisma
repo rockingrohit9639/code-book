@@ -33,11 +33,15 @@ model User {
   github   String?
   linkedin String?
 
-  password String
-  salt     String
+  // In case of third-party login, user does not need a password
+  password String?
+  salt     String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  // For profile picture from google
+  picture String?
 
   files                File[]
   posts                Post[]
