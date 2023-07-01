@@ -16,6 +16,7 @@ import Post from '~/components/post'
 import useError from '~/hooks/use-error'
 import { UserWithoutSensitiveData } from '~/types/user'
 import CreateConversation from '~/components/create-conversation'
+import LinkWithGoogle from '~/components/link-with-google'
 
 export default function Profile() {
   const { username } = useParams() as { username: string }
@@ -181,7 +182,6 @@ export default function Profile() {
             </div>
             <div className="text-sm text-gray-500">{profile.data?.bio}</div>
           </div>
-
           <div className="flex items-center space-x-4">
             <div className="flex gap-2">
               <div className="font-medium">{profile.data?.posts?.length ?? 0}</div>
@@ -196,7 +196,6 @@ export default function Profile() {
               <div>following</div>
             </div>
           </div>
-
           <div className="flex items-center space-x-4">
             {profile.data?.website ? (
               <Link to={profile.data.website} target="_black" rel="noreferrer">
@@ -214,7 +213,6 @@ export default function Profile() {
               </Link>
             ) : null}
           </div>
-
           <div>
             {profile.data?.tags?.map((tag) => (
               <Tag key={tag} color={randomColor()}>
@@ -222,7 +220,6 @@ export default function Profile() {
               </Tag>
             ))}
           </div>
-
           <div className="flex items-center space-x-2">
             {profile.data?.followerIds.includes(user.id) ? (
               <CreateConversation
@@ -257,6 +254,10 @@ export default function Profile() {
                 Remove Follower
               </Button>
             ) : null}
+          </div>
+
+          <div>
+            <LinkWithGoogle />
           </div>
         </div>
       </div>

@@ -18,6 +18,9 @@ export type User = {
   password: string
   salt: string
   tags?: string[]
+  sub?: string
+  picture?: string
+
   createdAt: string
   updatedAt: string
   followers: User[]

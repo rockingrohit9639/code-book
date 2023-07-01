@@ -59,6 +59,11 @@ export class SignupDto {
   password: string
 }
 
+export class LinkWithGoogleDto {
+  @IsString()
+  access_token: string
+}
+
 export class LoginWithGoogleDto {
   @IsString()
   accessToken: string

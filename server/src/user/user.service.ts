@@ -11,7 +11,7 @@ import { omit } from 'lodash'
 import { ConfigService } from '@nestjs/config'
 import { PrismaService } from '~/prisma/prisma.service'
 import { BasicUser, UserWithoutSensitiveData } from './user.type'
-import { CreateGoogleUserDto, SignupDto } from '~/auth/auth.dto'
+import { SignupDto } from '~/auth/auth.dto'
 import { BASIC_USER_SELECT_FIELDS, USER_SELECT_FIELDS } from './user.fields'
 import { SearchUserDto, UpdateUserProfileDto } from './user.dto'
 import { POST_INCLUDE_FIELDS } from '~/post/post.fields'
@@ -148,25 +148,6 @@ export class UserService {
     })
   }
 
-  async findOrCreateGoogleUser(username: string, payload: CreateGoogleUserDto): Promise<UserWithoutSensitiveData> {
-    let user = await this.prismaService.user.findFirst({ where: { username }, select: USER_SELECT_FIELDS })
-
-    if (!user) {
-      user = await this.prismaService.user.create({
-        data: {
-          username,
-          email: payload.email,
-          firstName: payload.given_name,
-          lastName: payload.family_name,
-          picture: payload.picture,
-        },
-        select: USER_SELECT_FIELDS,
-      })
-    }
-
-    return user
-  }
-
   async updateUserProfile(
     id: string,
     dto: UpdateUserProfileDto,
@@ -234,6 +215,10 @@ export class UserService {
       })),
       status: 'SAVED',
     }
+  }
+
+  async addGoogleSubInUser(userId: string, sub: string, picture?: string): Promise<UserWithoutSensitiveData> {
+    return this.prismaService.user.update({ where: { id: userId }, data: { sub, picture }, select: USER_SELECT_FIELDS })
   }
 
   /** Followers and Followings */

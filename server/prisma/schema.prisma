@@ -42,6 +42,8 @@ model User {
 
   // For profile picture from google
   picture String?
+  // Google's uniqe user id to link account with google
+  sub     String? @unique
 
   files                File[]
   posts                Post[]

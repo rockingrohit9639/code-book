@@ -1,4 +1,4 @@
-import { LoginDto, LoginWithGoogleDto, SignupDto } from '../types/auth'
+import { LinkWithGoogleDto, LoginDto, LoginWithGoogleDto, SignupDto } from '../types/auth'
 import { UserWithoutSensitiveData } from '../types/user'
 import { apiClient } from '../utils/client'
 
@@ -27,5 +27,10 @@ export async function loginWithGoogle(dto: LoginWithGoogleDto) {
     '/auth/login-with-google',
     dto,
   )
+  return data
+}
+
+export async function linkWithGoogle(dto: LinkWithGoogleDto) {
+  const { data } = await apiClient.post<UserWithoutSensitiveData>('/auth/link-with-google', dto)
   return data
 }

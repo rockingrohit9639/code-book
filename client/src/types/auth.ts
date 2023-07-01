@@ -15,3 +15,7 @@ export type LoginDto = {
 export type LoginWithGoogleDto = {
   accessToken: string
 }
+
+export type LinkWithGoogleDto = {
+  access_token: string
+}
