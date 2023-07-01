@@ -1,11 +1,14 @@
-import { GoogleLogin } from '@react-oauth/google'
-import { message } from 'antd'
+import { GoogleOutlined } from '@ant-design/icons'
+import { useGoogleLogin } from '@react-oauth/google'
+import { Button, ButtonProps, message } from 'antd'
 import { useMutation, useQueryClient } from 'react-query'
 import useError from '~/hooks/use-error'
 import { loginWithGoogle } from '~/queries/auth'
 import { ENV } from '~/utils/env'
 
-export default function LoginWithGoogle() {
+type LoginWithGoogleProps = Omit<ButtonProps, 'onClick'>
+
+export default function LoginWithGoogle(props: LoginWithGoogleProps) {
   const { handleError } = useError()
   const queryClient = useQueryClient()
 
@@ -21,16 +24,22 @@ export default function LoginWithGoogle() {
     },
   })
 
+  const login = useGoogleLogin({
+    onError: () => {
+      message.error('Failed to login with Google, please try again later.')
+    },
+    onSuccess: ({ access_token }) => {
+      loginWithGoogleMutation.mutate({ access_token })
+    },
+  })
+
   return (
-    <div className="flex items-center justify-center">
-      <GoogleLogin
-        useOneTap
-        onSuccess={(result) => {
-          if (result?.credential) {
-            loginWithGoogleMutation.mutate({ accessToken: result.credential })
-          }
-        }}
-      />
-    </div>
+    <Button
+      className="w-full"
+      icon={<GoogleOutlined />}
+      onClick={login}
+      loading={loginWithGoogleMutation.isLoading || props.loading}
+      disabled={loginWithGoogleMutation.isLoading || props.disabled}
+    />
   )
 }

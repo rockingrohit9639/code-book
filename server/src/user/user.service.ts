@@ -221,6 +221,14 @@ export class UserService {
     return this.prismaService.user.update({ where: { id: userId }, data: { sub, picture }, select: USER_SELECT_FIELDS })
   }
 
+  async findOneBySub(sub: string): Promise<UserWithoutSensitiveData> {
+    const user = await this.prismaService.user.findFirst({ where: { sub }, select: USER_SELECT_FIELDS })
+    if (!user) {
+      throw new NotFoundException('You account is not link with google!')
+    }
+    return user
+  }
+
   /** Followers and Followings */
   async follow(
     userId: string,

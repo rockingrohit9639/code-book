@@ -66,7 +66,7 @@ export class LinkWithGoogleDto {
 
 export class LoginWithGoogleDto {
   @IsString()
-  accessToken: string
+  access_token: string
 }
 
 export class CreateGoogleUserDto {

@@ -13,7 +13,7 @@ export type LoginDto = {
 }
 
 export type LoginWithGoogleDto = {
-  accessToken: string
+  access_token: string
 }
 
 export type LinkWithGoogleDto = {

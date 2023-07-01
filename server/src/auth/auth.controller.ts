@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common'
 import { AuthService } from './auth.service'
-import { LinkWithGoogleDto, LoginDto, SignupDto } from './auth.dto'
+import { LinkWithGoogleDto, LoginDto, LoginWithGoogleDto, SignupDto } from './auth.dto'
 import { UserWithoutSensitiveData } from '~/user/user.type'
 import { JwtGuard } from './jwt/jwt.guard'
 import { GetUser } from './user.decorator'
@@ -18,10 +18,10 @@ export class AuthController {
     return this.authService.linkAccountWithGoogle(dto, user)
   }
 
-  // @Post('login-with-google')
-  // async loginWithGoogle(@Body() dto: LoginWithGoogleDto) {
-  //   return this.authService.loginWithGoogle(dto)
-  // }
+  @Post('login-with-google')
+  async loginWithGoogle(@Body() dto: LoginWithGoogleDto) {
+    return this.authService.loginWithGoogle(dto)
+  }
 
   @Post('login')
   async login(@Body() loginDto: LoginDto): Promise<{ user: UserWithoutSensitiveData; token: string }> {

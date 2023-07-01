@@ -57,7 +57,9 @@ export default function Login() {
           </Button>
         </Form>
 
-        <LoginWithGoogle />
+        <div className="flex items-center justify-center">
+          <LoginWithGoogle />
+        </div>
 
         <Link to="/signup" className="block">
           <Button block>Did not have an account ?</Button>

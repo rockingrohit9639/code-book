@@ -256,9 +256,7 @@ export default function Profile() {
             ) : null}
           </div>
 
-          <div>
-            <LinkWithGoogle />
-          </div>
+          <div>{user.id === profile?.data?.id ? <LinkWithGoogle /> : null}</div>
         </div>
       </div>
 

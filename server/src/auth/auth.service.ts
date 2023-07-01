@@ -5,7 +5,7 @@ import { OAuth2Client, TokenPayload, UserRefreshClient } from 'google-auth-libra
 import { ConfigService } from '@nestjs/config'
 import { UserService } from '~/user/user.service'
 import { UserWithoutSensitiveData } from '~/user/user.type'
-import { LinkWithGoogleDto, LoginDto, SignupDto } from './auth.dto'
+import { LinkWithGoogleDto, LoginDto, LoginWithGoogleDto, SignupDto } from './auth.dto'
 import { JwtPayload } from './jwt/jwt.type'
 import { EnvironmentVars } from '~/config/config.options'
 
@@ -20,45 +20,6 @@ export class AuthService {
   ) {
     this.client = new OAuth2Client(configService.get('GOOGLE_CLIENT_ID'), configService.get('GOOGLE_CLIENT_SECRET'))
   }
-
-  private getUsername(payload: TokenPayload): string {
-    let username = payload.name?.replaceAll(' ', '_').toLowerCase()
-    if (!username) {
-      username = payload.email?.split('@')[0] ?? ''
-    }
-
-    return username
-  }
-
-  // async loginWithGoogle(dto: LoginWithGoogleDto): Promise<{ user: UserWithoutSensitiveData; token: string }> {
-  //   try {
-  //     const ticket = await this.client.verifyIdToken({
-  //       idToken: dto.accessToken,
-  //       audience: this.configService.get('GOOGLE_CLIENT_ID'),
-  //     })
-  //     const payload = ticket.getPayload()
-  //     if (!payload) {
-  //       throw new UnauthorizedException('Something went wrong while logging you in!')
-  //     }
-  //     const username = this.getUsername(payload)
-  //     if (!username) {
-  //       throw new ConflictException('Could not create username for this account, please try different one.')
-  //     }
-
-  //     console.log(payload)
-  //     const validPayload = payloadSchema.parse(payload)
-  //     const user = await this.userService.findOrCreateGoogleUser(username, validPayload)
-  //     const jwtPayload = { id: user.id, email: user.email } satisfies JwtPayload
-  //     const token = await this.jwtService.signAsync(jwtPayload)
-
-  //     return {
-  //       user,
-  //       token,
-  //     }
-  //   } catch (error) {
-  //     throw new InternalServerErrorException('Something went wrong!')
-  //   }
-  // }
 
   async validatePayload(payload: JwtPayload): Promise<UserWithoutSensitiveData> {
     const user = await this.userService.findOneByEmail(payload.email)
@@ -96,16 +57,13 @@ export class AuthService {
     return this.userService.isEmailExists(email)
   }
 
-  async linkAccountWithGoogle(
-    dto: LinkWithGoogleDto,
-    user: UserWithoutSensitiveData,
-  ): Promise<UserWithoutSensitiveData> {
+  private async getPayloadByAccessToken(access_token: string): Promise<TokenPayload> {
     try {
       /** Verifying if the access_token sent by user is valid */
       const refreshClient = new UserRefreshClient(
         this.configService.get('GOOGLE_CLIENT_ID'),
         this.configService.get('GOOGLE_CLIENT_SECRET'),
-        dto.access_token,
+        access_token,
       )
       /** Getting the credentials if it is valid */
       const { credentials } = await refreshClient.refreshAccessToken()
@@ -120,14 +78,43 @@ export class AuthService {
         audience: this.configService.get('GOOGLE_CLIENT_ID'),
       })
       const payload = ticket.getPayload()
-      if (!payload?.sub) {
+
+      if (!payload) {
         throw new InternalServerErrorException('Something went wrong, please try again!')
       }
 
-      /** If everything goes well, we will add sub in our user which will make sure if account is linked with google or not */
-      return this.userService.addGoogleSubInUser(user.id, payload.sub, payload.profile)
+      return payload
     } catch (error) {
-      throw new InternalServerErrorException('Something went wrong please try again')
+      throw new InternalServerErrorException('Something went wrong, please try again!')
+    }
+  }
+
+  async linkAccountWithGoogle(
+    dto: LinkWithGoogleDto,
+    user: UserWithoutSensitiveData,
+  ): Promise<UserWithoutSensitiveData> {
+    const payload = await this.getPayloadByAccessToken(dto.access_token)
+    if (!payload?.sub) {
+      throw new InternalServerErrorException('Something went wrong, please try again!')
+    }
+
+    /** If everything goes well, we will add sub in our user which will make sure if account is linked with google or not */
+    return this.userService.addGoogleSubInUser(user.id, payload.sub, payload.profile)
+  }
+
+  async loginWithGoogle(dto: LoginWithGoogleDto): Promise<{ user: UserWithoutSensitiveData; token: string }> {
+    const payload = await this.getPayloadByAccessToken(dto.access_token)
+    if (!payload?.sub) {
+      throw new InternalServerErrorException('Something went wrong, please try again!')
+    }
+
+    const user = await this.userService.findOneBySub(payload.sub)
+    const jwtPayload = { id: user.id, email: user.email } satisfies JwtPayload
+    const token = await this.jwtService.signAsync(jwtPayload)
+
+    return {
+      user,
+      token,
     }
   }
 }
