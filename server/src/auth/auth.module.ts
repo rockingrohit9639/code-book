@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common'
 import { JwtModule } from '@nestjs/jwt'
 import { PassportModule } from '@nestjs/passport'
 import { ConfigService } from '@nestjs/config'
+import axios from 'axios'
 import { AuthService } from './auth.service'
 import { PrismaService } from '~/prisma/prisma.service'
 import { UserModule } from '~/user/user.module'
@@ -23,7 +24,20 @@ import { JwtStrategy } from './jwt/jwt.strategy'
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, PrismaService, JwtStrategy],
+  providers: [
+    AuthService,
+    PrismaService,
+    JwtStrategy,
+    {
+      provide: 'GITHUB_API_CLIENT',
+      useFactory: () => {
+        return axios.create({
+          baseURL: 'https://github.com',
+        })
+      },
+      inject: [ConfigService],
+    },
+  ],
   exports: [],
 })
 export class AuthModule {}

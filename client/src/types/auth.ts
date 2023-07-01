@@ -12,10 +12,10 @@ export type LoginDto = {
   password: string
 }
 
-export type LoginWithGoogleDto = {
+export type LoginOrLoginWithGoogleDto = {
   access_token: string
 }
 
-export type LinkWithGoogleDto = {
-  access_token: string
+export type LinkOrLoginWithGithubDto = {
+  code: string
 }

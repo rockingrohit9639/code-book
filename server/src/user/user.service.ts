@@ -222,8 +222,19 @@ export class UserService {
   }
 
   async findOneBySub(sub: string): Promise<UserWithoutSensitiveData | null> {
-    const user = await this.prismaService.user.findFirst({ where: { sub }, select: USER_SELECT_FIELDS })
-    return user
+    return this.prismaService.user.findFirst({ where: { sub }, select: USER_SELECT_FIELDS })
+  }
+
+  async findOneByGithubUsername(username: string): Promise<UserWithoutSensitiveData | null> {
+    return this.prismaService.user.findFirst({ where: { githubUsername: username }, select: USER_SELECT_FIELDS })
+  }
+
+  addGithubDataInUser(user: string, githubUsername: string, githubProfile: string): Promise<UserWithoutSensitiveData> {
+    return this.prismaService.user.update({
+      where: { id: user },
+      data: { githubUsername, githubProfile },
+      select: USER_SELECT_FIELDS,
+    })
   }
 
   /** Followers and Followings */

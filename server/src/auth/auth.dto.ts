@@ -5,7 +5,6 @@ import {
   IsOptional,
   IsPositive,
   IsString,
-  IsUrl,
   Matches,
   Max,
   MaxLength,
@@ -59,30 +58,12 @@ export class SignupDto {
   password: string
 }
 
-export class LinkWithGoogleDto {
+export class LinkOrLoginWithGoogleDto {
   @IsString()
   access_token: string
 }
 
-export class LoginWithGoogleDto {
+export class LinkOrLoginWithGithubDto {
   @IsString()
-  access_token: string
-}
-
-export class CreateGoogleUserDto {
-  @IsEmail()
-  email: string
-
-  @IsString()
-  name: string
-
-  @IsUrl()
-  picture: string
-
-  @IsString()
-  given_name: string
-
-  @IsOptional()
-  @IsString()
-  family_name?: string
+  code: string
 }

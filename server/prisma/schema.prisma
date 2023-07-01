@@ -45,6 +45,10 @@ model User {
   // Google's uniqe user id to link account with google
   sub     String? @unique
 
+  // For Github
+  githubUsername String?
+  githubProfile  String?
+
   files                File[]
   posts                Post[]
   followers            User[]         @relation("UserFollows", fields: [followerIds], references: [id])

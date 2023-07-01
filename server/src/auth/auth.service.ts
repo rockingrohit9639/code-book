@@ -1,11 +1,14 @@
-import { ConflictException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common'
+import { ConflictException, Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { omit } from 'lodash'
 import { OAuth2Client, TokenPayload, UserRefreshClient } from 'google-auth-library'
 import { ConfigService } from '@nestjs/config'
+import { AxiosInstance } from 'axios'
+import * as qs from 'qs'
+import { Octokit } from '@octokit/core'
 import { UserService } from '~/user/user.service'
 import { UserWithoutSensitiveData } from '~/user/user.type'
-import { LinkWithGoogleDto, LoginDto, LoginWithGoogleDto, SignupDto } from './auth.dto'
+import { LinkOrLoginWithGithubDto, LinkOrLoginWithGoogleDto, LoginDto, SignupDto } from './auth.dto'
 import { JwtPayload } from './jwt/jwt.type'
 import { EnvironmentVars } from '~/config/config.options'
 
@@ -17,6 +20,7 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService<EnvironmentVars>,
+    @Inject('GITHUB_API_CLIENT') private readonly githubApiClient: AxiosInstance,
   ) {
     this.client = new OAuth2Client(configService.get('GOOGLE_CLIENT_ID'), configService.get('GOOGLE_CLIENT_SECRET'))
   }
@@ -90,7 +94,7 @@ export class AuthService {
   }
 
   async linkAccountWithGoogle(
-    dto: LinkWithGoogleDto,
+    dto: LinkOrLoginWithGoogleDto,
     user: UserWithoutSensitiveData,
   ): Promise<UserWithoutSensitiveData> {
     const payload = await this.getPayloadByAccessToken(dto.access_token)
@@ -107,7 +111,7 @@ export class AuthService {
     return this.userService.addGoogleSubInUser(user.id, payload.sub, payload.picture)
   }
 
-  async loginWithGoogle(dto: LoginWithGoogleDto): Promise<{ user: UserWithoutSensitiveData; token: string }> {
+  async loginWithGoogle(dto: LinkOrLoginWithGoogleDto): Promise<{ user: UserWithoutSensitiveData; token: string }> {
     const payload = await this.getPayloadByAccessToken(dto.access_token)
     if (!payload?.sub) {
       throw new InternalServerErrorException('Something went wrong, please try again!')
@@ -124,6 +128,62 @@ export class AuthService {
     return {
       user,
       token,
+    }
+  }
+
+  async linkAccountWithGithub(
+    dto: LinkOrLoginWithGithubDto,
+    user: UserWithoutSensitiveData,
+  ): Promise<UserWithoutSensitiveData> {
+    /** Getting the access token from code provided by github */
+    const access_token = await this.exchangeCodeForToken(dto.code)
+
+    /** Getting the user data by access token  */
+    const data = await this.getUserDataByAccessToken(access_token)
+    const existingUser = await this.userService.findOneByGithubUsername(data.username)
+    if (existingUser) {
+      throw new ConflictException('This github account is already linked with another account!')
+    }
+
+    /** If everything goes well, we will add github provided data in our database */
+    return this.userService.addGithubDataInUser(user.id, data.username, data.profile)
+  }
+
+  /** Exchanging the authentication code for an access token */
+  private async exchangeCodeForToken(code: string): Promise<string> {
+    const options = {
+      client_id: this.configService.get('GITHUB_CLIENT_ID'),
+      client_secret: this.configService.get('GITHUB_CLIENT_SECRET'),
+      code,
+    }
+
+    const { data } = await this.githubApiClient.post(`/login/oauth/access_token?${qs.stringify(options)}`, undefined, {
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+    })
+
+    if (!data.access_token) {
+      throw new InternalServerErrorException('Something went wrong while verifying!')
+    }
+
+    return data.access_token
+  }
+
+  /** Getting user data by access token */
+  private async getUserDataByAccessToken(access_token: string): Promise<{ username: string; profile: string }> {
+    try {
+      const octokit = new Octokit({ auth: access_token })
+      const { data } = await octokit.request('GET /user')
+
+      if (!data.login) {
+        throw new InternalServerErrorException('Something went wrong while verifying!')
+      }
+
+      return { username: data.login, profile: data.avatar_url }
+    } catch (error) {
+      throw new InternalServerErrorException('Something went wrong while verifying')
     }
   }
 }

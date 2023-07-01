@@ -20,6 +20,8 @@ export type User = {
   tags?: string[]
   sub?: string
   picture?: string
+  githubUsername?: string
+  githubProfile?: string
 
   createdAt: string
   updatedAt: string

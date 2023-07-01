@@ -12,6 +12,7 @@ const Home = lazy(() => import('~/pages/home'))
 const Profile = lazy(() => import('~/pages/profile'))
 const PostDetails = lazy(() => import('~/pages/post-details'))
 const Messages = lazy(() => import('~/pages/messages'))
+const GithubCallback = lazy(() => import('~/pages/github-callback'))
 
 function App() {
   const { authVerificationInProgress } = useAuthContext()
@@ -49,6 +50,7 @@ function App() {
         <Route path="/post/:id" element={<PostDetails />} />
         <Route path="/messages" element={<Messages />} />
         <Route path="/messages/:conversationId" element={<Messages />} />
+        <Route path="/github-callback" element={<GithubCallback />} />
       </Route>
 
       <Route path="/login" element={<Login />} />

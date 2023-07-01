@@ -36,4 +36,8 @@ export const USER_SELECT_FIELDS = {
   // Google provided fields
   picture: true,
   sub: true,
+
+  // Github provided fields
+  githubUsername: true,
+  githubProfile: true,
 } satisfies Prisma.UserSelect

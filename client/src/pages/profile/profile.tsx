@@ -2,7 +2,14 @@ import { Button, Result, Tabs, Tag } from 'antd'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
 import { Link, useParams } from 'react-router-dom'
 import { AiOutlineGlobal, AiOutlineGithub, AiOutlineLinkedin } from 'react-icons/ai'
-import { EditOutlined, GoogleOutlined, MessageOutlined, UserAddOutlined, UserDeleteOutlined } from '@ant-design/icons'
+import {
+  EditOutlined,
+  GithubOutlined,
+  GoogleOutlined,
+  MessageOutlined,
+  UserAddOutlined,
+  UserDeleteOutlined,
+} from '@ant-design/icons'
 import { BiBookmark, BiGridAlt } from 'react-icons/bi'
 import { useCallback, useMemo } from 'react'
 import invariant from 'tiny-invariant'
@@ -18,12 +25,14 @@ import useError from '~/hooks/use-error'
 import { UserWithoutSensitiveData } from '~/types/user'
 import CreateConversation from '~/components/create-conversation'
 import LinkWithGoogle from '~/components/link-with-google'
+import { getGitHubUrl } from '~/utils/github'
 
 export default function Profile() {
   const { username } = useParams() as { username: string }
   const { user } = useUser()
   const { handleError } = useError()
   const queryClient = useQueryClient()
+
   const profile = useQuery(['profile', username], () => fetchProfile(username))
 
   const followMutation = useMutation(follow, {
@@ -260,13 +269,26 @@ export default function Profile() {
             ) : null}
           </div>
 
-          <div>
+          <div className="flex items-center space-x-2">
             {user.id === profile?.data?.id ? (
               <LinkWithGoogle />
             ) : profile.data?.sub ? (
               <Button icon={<GoogleOutlined />} className="flex items-center">
                 <GoVerified className="text-green-700" />
               </Button>
+            ) : null}
+
+            {profile.data?.githubUsername ? (
+              <Button icon={<GithubOutlined />} className="flex items-center">
+                <GoVerified className="text-green-700" />
+              </Button>
+            ) : user.id === profile.data?.id ? (
+              <Button
+                icon={<GithubOutlined />}
+                onClick={() => {
+                  window.location.href = getGitHubUrl()
+                }}
+              />
             ) : null}
           </div>
         </div>

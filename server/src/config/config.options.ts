@@ -13,6 +13,9 @@ const validationSchema = joi
     GOOGLE_CLIENT_ID: joi.string().required(),
     GOOGLE_CLIENT_SECRET: joi.string().required(),
     GOOGLE_CALLBACK_URI: joi.string().uri().required(),
+    GITHUB_CLIENT_ID: joi.string().required(),
+    GITHUB_CLIENT_SECRET: joi.string().required(),
+    GITHUB_REDIRECT_URI: joi.string().uri().required(),
   })
   .required()
 
