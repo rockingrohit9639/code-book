@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common'
+import { ConflictException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { omit } from 'lodash'
 import { OAuth2Client, TokenPayload, UserRefreshClient } from 'google-auth-library'
@@ -98,8 +98,13 @@ export class AuthService {
       throw new InternalServerErrorException('Something went wrong, please try again!')
     }
 
+    const existingUser = await this.userService.findOneBySub(payload.sub)
+    if (existingUser) {
+      throw new ConflictException('This google account is already linked with another account!')
+    }
+
     /** If everything goes well, we will add sub in our user which will make sure if account is linked with google or not */
-    return this.userService.addGoogleSubInUser(user.id, payload.sub, payload.profile)
+    return this.userService.addGoogleSubInUser(user.id, payload.sub, payload.picture)
   }
 
   async loginWithGoogle(dto: LoginWithGoogleDto): Promise<{ user: UserWithoutSensitiveData; token: string }> {
@@ -109,6 +114,10 @@ export class AuthService {
     }
 
     const user = await this.userService.findOneBySub(payload.sub)
+    if (!user) {
+      throw new NotFoundException('You account is not link with google!')
+    }
+
     const jwtPayload = { id: user.id, email: user.email } satisfies JwtPayload
     const token = await this.jwtService.signAsync(jwtPayload)
 

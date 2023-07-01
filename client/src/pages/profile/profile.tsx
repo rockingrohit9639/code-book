@@ -2,11 +2,12 @@ import { Button, Result, Tabs, Tag } from 'antd'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
 import { Link, useParams } from 'react-router-dom'
 import { AiOutlineGlobal, AiOutlineGithub, AiOutlineLinkedin } from 'react-icons/ai'
-import { EditOutlined, MessageOutlined, UserAddOutlined, UserDeleteOutlined } from '@ant-design/icons'
+import { EditOutlined, GoogleOutlined, MessageOutlined, UserAddOutlined, UserDeleteOutlined } from '@ant-design/icons'
 import { BiBookmark, BiGridAlt } from 'react-icons/bi'
 import { useCallback, useMemo } from 'react'
 import invariant from 'tiny-invariant'
 import randomColor from 'randomcolor'
+import { GoVerified } from 'react-icons/go'
 import Loading from '~/components/loading'
 import { fetchProfile, follow, removeFollower, unfollow } from '~/queries/user'
 import { getErrorMessage } from '~/utils/error'
@@ -162,7 +163,10 @@ export default function Profile() {
   return (
     <div className="space-y-4 p-4">
       <div className="grid grid-cols-6 items-center gap-8">
-        <img src="/code.png" className="col-span-2 h-60 w-60 rounded-full object-cover" />
+        <img
+          src={profile.data?.picture ? profile.data.picture : '/code.png'}
+          className="col-span-2 h-60 w-60 rounded-full object-cover"
+        />
 
         <div className="col-span-4 space-y-4">
           <div>
@@ -256,7 +260,15 @@ export default function Profile() {
             ) : null}
           </div>
 
-          <div>{user.id === profile?.data?.id ? <LinkWithGoogle /> : null}</div>
+          <div>
+            {user.id === profile?.data?.id ? (
+              <LinkWithGoogle />
+            ) : profile.data?.sub ? (
+              <Button icon={<GoogleOutlined />} className="flex items-center">
+                <GoVerified className="text-green-700" />
+              </Button>
+            ) : null}
+          </div>
         </div>
       </div>
 
