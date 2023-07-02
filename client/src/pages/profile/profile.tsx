@@ -286,7 +286,7 @@ export default function Profile() {
               <Button
                 icon={<GithubOutlined />}
                 onClick={() => {
-                  window.location.href = getGitHubUrl()
+                  window.location.href = getGitHubUrl(true)
                 }}
               />
             ) : null}

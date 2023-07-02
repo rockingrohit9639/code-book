@@ -186,4 +186,22 @@ export class AuthService {
       throw new InternalServerErrorException('Something went wrong while verifying')
     }
   }
+
+  async loginWithGithub(dto: LinkOrLoginWithGithubDto): Promise<{ user: UserWithoutSensitiveData; token: string }> {
+    const access_token = await this.exchangeCodeForToken(dto.code)
+    const data = await this.getUserDataByAccessToken(access_token)
+
+    const user = await this.userService.findOneByGithubUsername(data.username)
+    if (!user) {
+      throw new NotFoundException('You account is not linked with github!')
+    }
+
+    const jwtPayload = { id: user.id, email: user.email } satisfies JwtPayload
+    const token = await this.jwtService.signAsync(jwtPayload)
+
+    return {
+      user,
+      token,
+    }
+  }
 }

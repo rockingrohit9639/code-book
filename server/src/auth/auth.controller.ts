@@ -18,6 +18,13 @@ export class AuthController {
     return this.authService.linkAccountWithGithub(dto, user)
   }
 
+  @Post('login-with-github')
+  async loginWithGithub(
+    @Body() dto: LinkOrLoginWithGithubDto,
+  ): Promise<{ user: UserWithoutSensitiveData; token: string }> {
+    return this.authService.loginWithGithub(dto)
+  }
+
   @UseGuards(JwtGuard)
   @Post('link-with-google')
   async linkAccountWithGoogle(

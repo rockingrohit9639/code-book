@@ -1,7 +1,9 @@
 import { Button, Form, Input } from 'antd'
 import { Link, Navigate, useSearchParams } from 'react-router-dom'
+import { GithubOutlined } from '@ant-design/icons'
 import { useAuthContext } from '../../hooks/use-auth'
 import LoginWithGoogle from '~/components/login-with-google'
+import { getGitHubUrl } from '~/utils/github'
 
 export default function Login() {
   const { user, loginMutation } = useAuthContext()
@@ -57,8 +59,14 @@ export default function Login() {
           </Button>
         </Form>
 
-        <div className="flex items-center justify-center">
+        <div className="flex items-center justify-center space-x-2">
           <LoginWithGoogle />
+          <Button
+            icon={<GithubOutlined />}
+            onClick={() => {
+              window.location.href = getGitHubUrl(false)
+            }}
+          />
         </div>
 
         <Link to="/signup" className="block">

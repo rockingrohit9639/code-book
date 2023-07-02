@@ -1,4 +1,4 @@
-import { LinkOrLoginWithGithubDto, LoginDto, LoginOrLoginWithGoogleDto, SignupDto } from '../types/auth'
+import { LinkOrLoginWithGithubDto, LoginDto, LinkOrLoginWithGoogleDto, SignupDto } from '../types/auth'
 import { UserWithoutSensitiveData } from '../types/user'
 import { apiClient } from '../utils/client'
 
@@ -22,7 +22,7 @@ export async function login(dto: LoginDto) {
   return data
 }
 
-export async function loginWithGoogle(dto: LoginOrLoginWithGoogleDto) {
+export async function loginWithGoogle(dto: LinkOrLoginWithGoogleDto) {
   const { data } = await apiClient.post<{ user: UserWithoutSensitiveData; token: string }>(
     '/auth/login-with-google',
     dto,
@@ -30,12 +30,20 @@ export async function loginWithGoogle(dto: LoginOrLoginWithGoogleDto) {
   return data
 }
 
-export async function linkWithGoogle(dto: LoginOrLoginWithGoogleDto) {
+export async function linkWithGoogle(dto: LinkOrLoginWithGoogleDto) {
   const { data } = await apiClient.post<UserWithoutSensitiveData>('/auth/link-with-google', dto)
   return data
 }
 
 export async function linkWithGithub(dto: LinkOrLoginWithGithubDto) {
   const { data } = await apiClient.post<UserWithoutSensitiveData>('/auth/link-with-github', dto)
+  return data
+}
+
+export async function loginWithGithub(dto: LinkOrLoginWithGithubDto) {
+  const { data } = await apiClient.post<{ user: UserWithoutSensitiveData; token: string }>(
+    '/auth/login-with-github',
+    dto,
+  )
   return data
 }
