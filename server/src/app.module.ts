@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
+import { ScheduleModule } from '@nestjs/schedule'
 import { configOptions } from './config/config.options'
 import { PrismaService } from './prisma/prisma.service'
 import { UserModule } from './user/user.module'
@@ -16,6 +17,7 @@ import { TagModule } from './tag/tag.module'
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     ConfigModule.forRoot(configOptions),
     UserModule,
     AuthModule,

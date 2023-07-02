@@ -101,8 +101,9 @@ model Post {
   notifications Notification[]
   viewdByUsers  View[]
 
-  savedBy    User[]   @relation(name: "SavedPosts", fields: [savedByIds], references: [id])
-  savedByIds String[] @db.ObjectId
+  savedBy      User[]         @relation(name: "SavedPosts", fields: [savedByIds], references: [id])
+  savedByIds   String[]       @db.ObjectId
+  trendingPost TrendingPost[]
 }
 
 model Like {
@@ -196,4 +197,15 @@ model Tag {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   tag       String   @unique
+}
+
+model TrendingPost {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  score Float
+
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId String @db.ObjectId
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
