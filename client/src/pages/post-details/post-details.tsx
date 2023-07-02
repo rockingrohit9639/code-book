@@ -1,7 +1,7 @@
 import { Dropdown, Result, Tag, message } from 'antd'
 import { ItemType } from 'antd/es/menu/hooks/useItems'
 import dayjs from 'dayjs'
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { AiOutlineCopy, AiOutlineDelete, AiOutlineShareAlt } from 'react-icons/ai'
 import { HiOutlineDotsVertical } from 'react-icons/hi'
 import { useQuery } from 'react-query'
@@ -22,7 +22,7 @@ export default function PostDetails() {
   const { user } = useUser()
   const { id } = useParams() as { id: string }
   const navigate = useNavigate()
-  const { posts, isLoading, error } = usePostsContext()
+  const { posts, isLoading, error, updateViewsMutation } = usePostsContext()
 
   const post = useMemo(() => {
     return posts?.find((p) => p.id === id)
@@ -64,6 +64,13 @@ export default function PostDetails() {
 
     return items
   }, [post, user, navigate])
+
+  useEffect(function updatePostLikes() {
+    if (!post) return
+    updateViewsMutation.mutate(post.id)
+
+    // eslint-disable-next-line
+  }, [])
 
   if (isLoading) {
     return <Loading className="h-screen" title="Loading post details..." />
