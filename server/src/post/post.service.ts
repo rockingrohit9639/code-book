@@ -160,4 +160,11 @@ export class PostService {
       this.logger.error(error)
     }
   }
+
+  async findTrendingPosts(): Promise<Array<Post & { isTrending?: boolean }>> {
+    const trendingPosts = await this.prismaService.trendingPost.findMany({
+      include: { post: { include: POST_INCLUDE_FIELDS } },
+    })
+    return trendingPosts.map(({ post }) => ({ ...post, isTrending: true }))
+  }
 }

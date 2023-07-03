@@ -21,6 +21,11 @@ export async function fetchPostDetails(id: string) {
   return data
 }
 
+export async function fetchTrendingPosts() {
+  const { data } = await apiClient.get<Post[]>('/posts/trending')
+  return data
+}
+
 /** Likes */
 export async function likePost(postId: string) {
   const { data } = await apiClient.post<Like>(`/like/${postId}`)

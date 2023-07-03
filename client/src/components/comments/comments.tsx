@@ -23,7 +23,7 @@ export default function Comments({ className, style, comments, postId }: Comment
   const addCommentMutation = useMutation((comment: string) => addComment(postId, comment), {
     onError: handleError,
     onSuccess: (comment) => {
-      queryClient.setQueryData<Post[]>(['posts'], (prev) => {
+      queryClient.setQueryData<Post[]>(['all-posts'], (prev) => {
         if (!prev) return []
 
         return prev.map((_post) => {

@@ -1,25 +1,38 @@
 import { useMutation, useQuery, useQueryClient } from 'react-query'
 import { useCallback, useEffect } from 'react'
 import constate from 'constate'
-import { fetchPosts, likePost, unlikePost, updateViews } from '~/queries/post'
+import { fetchPosts, fetchTrendingPosts, likePost, unlikePost, updateViews } from '~/queries/post'
 import { Comment, Like, Post } from '~/types/post'
 import { useSocketContext } from './use-socket'
 import useError from './use-error'
 import { useAuthContext } from './use-auth'
+import { getMergedPosts } from '~/utils/post'
 
 export function usePosts() {
   const { user } = useAuthContext()
   const { data, isLoading, error } = useQuery(['posts'], fetchPosts, {
     enabled: !!user,
   })
+  const { data: trendingPosts } = useQuery(['trending-posts'], fetchTrendingPosts, {
+    enabled: !!user,
+  })
+
   const { socket } = useSocketContext()
   const queryClient = useQueryClient()
   const { handleError } = useError()
 
+  /** Doing this manage all the posts in one context, so that we don't have to manage like or comments etc. */
+  const allPosts = useQuery({
+    queryKey: ['all-posts'],
+    queryFn: () => getMergedPosts(data ?? [], trendingPosts ?? []),
+    initialData: [...(data ?? [])],
+    enabled: Boolean(data?.length),
+  })
+
   /** Handling socket events */
   const handleLike = useCallback(
     (newLike: Like) => {
-      queryClient.setQueryData<Post[]>(['posts'], (oldPosts) => {
+      queryClient.setQueryData<Post[]>(['all-posts'], (oldPosts) => {
         if (!oldPosts) {
           return []
         }
@@ -37,7 +50,7 @@ export function usePosts() {
 
   const handleDislike = useCallback(
     (dislike: Like) => {
-      queryClient.setQueryData<Post[]>(['posts'], (oldPosts) => {
+      queryClient.setQueryData<Post[]>(['all-posts'], (oldPosts) => {
         if (!oldPosts) {
           return []
         }
@@ -55,7 +68,7 @@ export function usePosts() {
 
   const handleNewComment = useCallback(
     (newComment: Comment) => {
-      queryClient.setQueryData<Post[]>(['posts'], (oldPosts) => {
+      queryClient.setQueryData<Post[]>(['all-posts'], (oldPosts) => {
         if (!oldPosts) {
           return []
         }
@@ -73,7 +86,7 @@ export function usePosts() {
 
   const handleRemoveComment = useCallback(
     (deletedComment: Comment) => {
-      queryClient.setQueryData<Post[]>(['posts'], (oldPosts) => {
+      queryClient.setQueryData<Post[]>(['all-posts'], (oldPosts) => {
         if (!oldPosts) {
           return []
         }
@@ -93,7 +106,7 @@ export function usePosts() {
   const likePostMutation = useMutation(likePost, {
     onError: handleError,
     onSuccess: (like) => {
-      queryClient.setQueryData<Post[]>(['posts'], (prev) => {
+      queryClient.setQueryData<Post[]>(['all-posts'], (prev) => {
         if (!prev) return []
 
         return prev.map((post) => {
@@ -110,7 +123,7 @@ export function usePosts() {
   const unLikePostMutation = useMutation(unlikePost, {
     onError: handleError,
     onSuccess: (like) => {
-      queryClient.setQueryData<Post[]>(['posts'], (prev) => {
+      queryClient.setQueryData<Post[]>(['all-posts'], (prev) => {
         if (!prev) return []
 
         return prev.map((post) => {
@@ -126,7 +139,7 @@ export function usePosts() {
 
   const updateViewsMutation = useMutation(updateViews, {
     onSuccess: (post) => {
-      queryClient.setQueryData<Post[]>(['posts'], (prev) => {
+      queryClient.setQueryData<Post[]>(['all-posts'], (prev) => {
         if (!prev) return []
 
         return prev.map((_post) => {
@@ -165,7 +178,9 @@ export function usePosts() {
   )
 
   return {
-    posts: data,
+    allPosts: allPosts.data,
+    posts: allPosts.data?.filter((post) => !post.isTrending),
+    trendingPosts: allPosts.data?.filter((post) => post.isTrending),
     isLoading,
     error,
     likePostMutation,

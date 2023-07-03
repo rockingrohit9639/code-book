@@ -15,21 +15,21 @@ type PostProps = {
   className?: string
   style?: React.CSSProperties
   postId?: string
-  incomingPost: PostType
+  incomingPost?: PostType
 }
 
 export default function Post({ className, style, postId, incomingPost }: PostProps) {
   const [commentVisible, setCommentVisible] = useState(false)
 
-  const { posts } = usePostsContext()
+  const { allPosts } = usePostsContext()
 
   const post = useMemo(() => {
     if (incomingPost) {
       return incomingPost
     }
 
-    return posts?.find((_post) => _post.id === postId)
-  }, [postId, posts, incomingPost])
+    return allPosts?.find((_post) => _post.id === postId)
+  }, [postId, allPosts, incomingPost])
 
   const postImage = useQuery(['post-image', post?.id], () => fetchFileById(post?.imageId!), {
     enabled: Boolean(post?.imageId),

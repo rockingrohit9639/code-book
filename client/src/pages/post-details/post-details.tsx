@@ -22,11 +22,11 @@ export default function PostDetails() {
   const { user } = useUser()
   const { id } = useParams() as { id: string }
   const navigate = useNavigate()
-  const { posts, isLoading, error, updateViewsMutation } = usePostsContext()
+  const { allPosts, isLoading, error, updateViewsMutation } = usePostsContext()
 
   const post = useMemo(() => {
-    return posts?.find((p) => p.id === id)
-  }, [posts, id])
+    return allPosts?.find((p) => p.id === id)
+  }, [allPosts, id])
 
   const postImage = useQuery(['post-image', id], () => fetchFileById(post?.imageId!), {
     enabled: Boolean(post?.imageId),
@@ -84,7 +84,7 @@ export default function PostDetails() {
     <Page className="space-y-4 p-4">
       <div className="flex items-center justify-between rounded-lg bg-white p-4 shadow-sm">
         <div>
-          <Link to={`/profile/${post?.createdBy.username}`}>@{post?.createdBy?.username}</Link>
+          <Link to={`/profile/${post?.createdBy?.username}`}>@{post?.createdBy?.username}</Link>
           <div className="text-sm text-gray-500">{post?.createdAt ? dayjs(post?.createdAt).fromNow() : null}</div>
         </div>
         <div>

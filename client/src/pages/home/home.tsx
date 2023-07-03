@@ -1,9 +1,12 @@
-import { Result } from 'antd'
+import { Result, Tabs } from 'antd'
 import { range } from 'lodash'
 import { useEffect, useMemo } from 'react'
+import { HiTrendingUp } from 'react-icons/hi'
 import { Link } from 'react-router-dom'
+import { MdOutlineFeed } from 'react-icons/md'
 import Page from '~/components/page'
 import Post from '~/components/post'
+import TrendingPosts from '~/components/trending-posts'
 import { useAppShellContext } from '~/hooks/use-app-shell'
 import useError from '~/hooks/use-error'
 import { usePosts } from '~/hooks/use-posts'
@@ -29,7 +32,35 @@ export default function Home() {
       return <Result status="500" title="Something went wrong while fetching posts" subTitle={getErrorMessage(error)} />
     }
 
-    return posts?.map((post) => <Post key={post.id} postId={post.id} />)
+    return (
+      <Tabs>
+        <Tabs.TabPane
+          key="feed"
+          tab={
+            <div className="flex items-center gap-2">
+              <MdOutlineFeed />
+              <div>Feed</div>
+            </div>
+          }
+        >
+          {posts?.map((post) => (
+            <Post key={post.id} postId={post.id} />
+          ))}
+        </Tabs.TabPane>
+
+        <Tabs.TabPane
+          key="trending"
+          tab={
+            <div className="flex items-center gap-2">
+              <HiTrendingUp className="h-6 w-6" />
+              <div>Trending</div>
+            </div>
+          }
+        >
+          <TrendingPosts />
+        </Tabs.TabPane>
+      </Tabs>
+    )
   }, [isLoading, error, getErrorMessage, posts])
 
   return (

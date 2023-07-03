@@ -11,6 +11,11 @@ import { JwtGuard } from '~/auth/jwt/jwt.guard'
 export class PostController {
   constructor(private readonly postService: PostService) {}
 
+  @Get('trending')
+  findTrendingPosts(): Promise<Array<Post & { isTrending?: boolean }>> {
+    return this.postService.findTrendingPosts()
+  }
+
   @Get()
   findAll(@GetUser() user: UserWithoutSensitiveData): Promise<Post[]> {
     return this.postService.findAll(user)

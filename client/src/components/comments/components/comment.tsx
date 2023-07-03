@@ -20,7 +20,7 @@ export default function Comment({ comment }: CommentProps) {
   const deleteCommentMutation = useMutation(deleteComment, {
     onError: handleError,
     onSuccess: (comment) => {
-      queryClient.setQueryData<Post[]>(['posts'], (prev) => {
+      queryClient.setQueryData<Post[]>(['all-posts'], (prev) => {
         if (!prev) return []
 
         return prev.map((p) => {

@@ -1,4 +1,6 @@
 import html2canvas from 'html2canvas'
+import { uniqBy } from 'lodash'
+import { Post } from '~/types/post'
 
 export const componentToImage = async (html: HTMLElement | null): Promise<string | null> => {
   if (html) {
@@ -13,4 +15,9 @@ export const componentToImage = async (html: HTMLElement | null): Promise<string
   }
 
   return null
+}
+
+export function getMergedPosts(posts: Post[], trendingPosts: Post[]): Promise<Post[]> {
+  const mergedPosts = [...posts, ...trendingPosts]
+  return Promise.resolve(uniqBy(mergedPosts, (post) => post.id))
 }

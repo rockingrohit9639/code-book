@@ -36,6 +36,7 @@ export type Post = {
   tags: string[]
   likes: Like[]
   comments: Comment[]
+  isTrending?: boolean
 }
 
 export type CreatePostDto = Pick<Post, 'title' | 'codeSnippet' | 'tags'> & {
