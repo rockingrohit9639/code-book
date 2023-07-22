@@ -36,7 +36,9 @@ export default function LinkWithGoogle(props: LinkWithGoogleProps) {
   ) : (
     <Button
       {...props}
-      onClick={login}
+      onClick={() => {
+        login()
+      }}
       icon={<GoogleOutlined />}
       loading={linkWithGoogleMutation.isLoading || props.loading}
       disabled={linkWithGoogleMutation.isLoading || props.disabled}

@@ -37,7 +37,9 @@ export default function LoginWithGoogle(props: LoginWithGoogleProps) {
     <Button
       className="w-full"
       icon={<GoogleOutlined />}
-      onClick={login}
+      onClick={() => {
+        login()
+      }}
       loading={loginWithGoogleMutation.isLoading || props.loading}
       disabled={loginWithGoogleMutation.isLoading || props.disabled}
     />
